@@ -1,0 +1,35 @@
+# Blueprint para Render (plan gratuito). Ver DEPLOY.md, "Opción B".
+# La base de datos NO va en Render (su Postgres gratis vence a los 30 días): se usa Neon.
+services:
+  - type: web
+    name: bracket
+    runtime: docker
+    plan: free
+    dockerfilePath: ./bracket/Dockerfile
+    dockerContext: ./bracket
+    healthCheckPath: /api/ping
+    envVars:
+      - key: PORT
+        value: "8400"
+      - key: ENVIRONMENT
+        value: PRODUCTION
+      - key: SERVE_FRONTEND
+        value: "true"
+      - key: API_PREFIX
+        value: /api
+      - key: ALLOW_USER_REGISTRATION
+        value: "false"
+      - key: ALLOW_DEMO_USER_REGISTRATION
+        value: "false"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PG_DSN
+        sync: false
+      - key: BASE_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

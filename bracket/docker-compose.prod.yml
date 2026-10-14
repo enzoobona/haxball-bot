@@ -1,0 +1,77 @@
+# Producción: Bracket + Postgres + Caddy (HTTPS automático con Let's Encrypt).
+#
+#   cp deploy/prod.env.example .env      # y completarlo
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Solo Caddy publica puertos (80/443). Bracket y Postgres quedan en la red interna.
+
+networks:
+  bracket_lan:
+    driver: bridge
+
+volumes:
+  bracket_pg_data:
+  bracket_static_data:
+  caddy_data:
+  caddy_config:
+
+services:
+  bracket:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ENVIRONMENT: PRODUCTION
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en el .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Falta ADMIN_EMAIL en el .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Falta ADMIN_PASSWORD en el .env}
+      PG_DSN: postgresql://bracket:${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en el .env}@postgres:5432/bracket
+      BASE_URL: https://${DOMAIN:?Falta DOMAIN en el .env}
+      CORS_ORIGINS: https://${DOMAIN}
+      SERVE_FRONTEND: "true"
+      API_PREFIX: /api
+      ALLOW_USER_REGISTRATION: "false"
+      ALLOW_DEMO_USER_REGISTRATION: "false"
+    networks:
+      - bracket_lan
+    volumes:
+      - bracket_static_data:/app/static
+
+  postgres:
+    image: postgres:17-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: bracket
+      POSTGRES_USER: bracket
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bracket -d bracket"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - bracket_lan
+    volumes:
+      - bracket_pg_data:/var/lib/postgresql/data
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - bracket
+    environment:
+      DOMAIN: ${DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      - bracket_lan
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config

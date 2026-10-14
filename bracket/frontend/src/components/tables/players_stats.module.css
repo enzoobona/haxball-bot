@@ -1,0 +1,21 @@
+.statisticsTable {
+  width: 100%;
+}
+
+.rank {
+  width: 3rem;
+  text-align: center;
+}
+
+.playerName {
+  font-weight: 700;
+}
+
+.statCell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.highlight {
+  font-weight: 800;
+}

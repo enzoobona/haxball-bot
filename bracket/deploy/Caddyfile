@@ -1,0 +1,5 @@
+# Caddy pide y renueva solo el certificado HTTPS para el dominio.
+{$DOMAIN} {
+    encode zstd gzip
+    reverse_proxy bracket:8400
+}
