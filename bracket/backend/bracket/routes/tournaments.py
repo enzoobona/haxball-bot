@@ -37,6 +37,7 @@ from bracket.sql.tournaments import (
     sql_create_tournament,
     sql_delete_tournament,
     sql_get_tournament,
+    sql_get_public_tournaments,
     sql_get_tournament_by_endpoint_name,
     sql_get_tournaments,
     sql_update_tournament,
@@ -59,6 +60,12 @@ unauthorized_exception = HTTPException(
     detail="You don't have access to this tournament",
     headers={"WWW-Authenticate": "Bearer"},
 )
+
+
+@router.get("/public/tournaments", response_model=TournamentsResponse)
+async def get_public_tournaments() -> TournamentsResponse:
+    """Lista los torneos públicos. No requiere iniciar sesión."""
+    return TournamentsResponse(data=await sql_get_public_tournaments())
 
 
 @router.get("/tournaments/{tournament_id}", response_model=TournamentResponse)

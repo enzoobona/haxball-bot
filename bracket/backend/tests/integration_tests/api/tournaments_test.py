@@ -263,3 +263,12 @@ async def test_non_public_tournament_endpoints_blocked_for_unauthenticated_users
                 f"Expected 401 for unauthenticated access to non-public endpoint {endpoint!r}, "
                 f"got: {response}"
             )
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_public_tournaments_endpoint_requires_no_auth(
+    startup_and_shutdown_uvicorn_server: None, auth_context: AuthContext
+) -> None:
+    response = await send_request(HTTPMethod.GET, "public/tournaments", {})
+    ids = [tournament["id"] for tournament in response["data"]]
+    assert auth_context.tournament.id in ids

@@ -20,6 +20,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_SITE_NAME: ${SITE_NAME:-}
+        VITE_SITE_TAGLINE: ${SITE_TAGLINE:-}
+        VITE_STREAM_URL: ${STREAM_URL:-}
+        VITE_DISCORD_URL: ${DISCORD_URL:-}
     restart: unless-stopped
     depends_on:
       postgres:

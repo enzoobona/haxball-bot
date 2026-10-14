@@ -11,10 +11,21 @@ COPY frontend .
 # el frontend y la API, así la imagen funciona en cualquier dominio sin reconstruirla.
 ARG VITE_API_BASE_URL=/api
 
+# Personalización del sitio público (opcional). Ver DEPLOY.md, sección 9.
+ARG VITE_SITE_NAME=""
+ARG VITE_SITE_TAGLINE=""
+ARG VITE_STREAM_URL=""
+ARG VITE_DISCORD_URL=""
+
 RUN npm install -g pnpm@12.11.2 && \
     pnpm --version && \
     CI=true pnpm install --frozen-lockfile --prod=false && \
-    VITE_API_BASE_URL=$VITE_API_BASE_URL pnpm build
+    VITE_API_BASE_URL=$VITE_API_BASE_URL \
+    VITE_SITE_NAME="$VITE_SITE_NAME" \
+    VITE_SITE_TAGLINE="$VITE_SITE_TAGLINE" \
+    VITE_STREAM_URL="$VITE_STREAM_URL" \
+    VITE_DISCORD_URL="$VITE_DISCORD_URL" \
+    pnpm build
 
 # Build backend image that also serves frontend (stored in `/app/frontend-dist`)
 FROM python:3.14-alpine3.22

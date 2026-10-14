@@ -32,6 +32,20 @@ async def sql_get_tournament_by_endpoint_name(endpoint_name: str) -> Tournament 
     return Tournament.model_validate(result) if result is not None else None
 
 
+async def sql_get_public_tournaments() -> list[Tournament]:
+    """Torneos que el organizador marcó como públicos (visibles sin iniciar sesión)."""
+    query = """
+        SELECT *
+        FROM tournaments
+        WHERE dashboard_public IS TRUE
+        AND dashboard_endpoint IS NOT NULL
+        AND dashboard_endpoint <> ''
+        ORDER BY (status = 'OPEN') DESC, start_time DESC
+        """
+    result = await database.fetch_all(query=query)
+    return [Tournament.model_validate(x) for x in result]
+
+
 async def sql_get_tournaments(
     club_ids: tuple[int, ...],
     endpoint_name: str | None = None,

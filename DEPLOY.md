@@ -270,3 +270,24 @@ backend real.
 Oracle, Render y Neon, la conexión SSL a Neon, ni una sala de Haxball real (requiere el captcha del token).
 Los pasos de las opciones A y B están armados con la documentación oficial vigente, pero es esperable que
 algún detalle de las consolas web (nombres de menús) haya cambiado.
+
+## 9. Página pública para tus seguidores
+
+Cualquier persona puede ver tus torneos **sin iniciar sesión**; solo vos (con tu usuario) ves las pantallas
+para editar.
+
+* **Portada pública** (`https://TU_DOMINIO/`): lista los torneos publicados. Si ya iniciaste sesión, en `/` ves
+  tu panel de organizador; para ver la portada como la ve el público entrá a `/torneos` (o al enlace
+  *Sitio público* del menú).
+* **Publicar un torneo**: en el panel, *Ajustes del torneo → Página pública del torneo*: escribí un enlace
+  corto (sin espacios, por ejemplo `copa_stream`), tildá *Permitir que cualquier persona vea el torneo* y
+  guardá. Aparece en la portada y su enlace es `https://TU_DOMINIO/tournaments/copa_stream/dashboard`
+  (el botón *Copiar enlace público* lo copia). Para ocultarlo, destildá la casilla.
+* **Qué ve el público**: *Partidos*, *Llaves*, *Posiciones* y *Equipos*, todo en solo lectura y con
+  actualización automática. Nunca ven jugadores sueltos, ajustes, edición de resultados ni el panel.
+* **Personalizarlo**: en el `.env` de `bracket/` (ver `deploy/prod.env.example`) podés poner `SITE_NAME`,
+  `SITE_TAGLINE`, `STREAM_URL` y `DISCORD_URL`. Son parte de la compilación del frontend, así que después de
+  cambiarlos hay que reconstruir: `docker compose -f docker-compose.prod.yml up -d --build`.
+* **Para OBS / el stream**: `/tournaments/copa_stream/dashboard/present/courts` y
+  `/tournaments/copa_stream/dashboard/present/standings` son pantallas pensadas para agregar como fuente de
+  navegador.
