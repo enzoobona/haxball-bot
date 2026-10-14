@@ -64,7 +64,7 @@ export default function PlayerUpdateModal({
             {...form.getInputProps('active', { type: 'checkbox' })}
           />
 
-          <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+          <Button fullWidth style={{ marginTop: 10 }} type="submit">
             {t('save_button')}
           </Button>
         </form>

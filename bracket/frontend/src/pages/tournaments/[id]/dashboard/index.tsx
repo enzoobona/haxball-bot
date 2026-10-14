@@ -1,122 +1,21 @@
-import { Alert, Badge, Card, Center, Flex, Grid, Group, Stack, Text } from '@mantine/core';
-import { AiOutlineHourglass } from '@react-icons/all-files/ai/AiOutlineHourglass';
-import { IconAlertCircle } from '@tabler/icons-react';
-import React from 'react';
+import { Center, SegmentedControl, Stack, Text } from '@mantine/core';
+import { IconCalendarOff } from '@tabler/icons-react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { DashboardFooter } from '@components/dashboard/footer';
-import { DoubleHeader, getTournamentHeadTitle } from '@components/dashboard/layout';
+import { DashboardShell, getTournamentHeadTitle } from '@components/dashboard/layout';
 import { NoContent } from '@components/no_content/empty_table_info';
-import { Time, compareDateTime, formatTime } from '@components/utils/datetime';
-import { formatMatchInput1, formatMatchInput2 } from '@components/utils/match';
+import MatchCard from '@components/public/match_card';
+import { compareDateTime, formatDayLabel } from '@components/utils/datetime';
+import { isMatchHappening, isMatchInTheFuture } from '@components/utils/match';
+import { TableSkeletonTwoColumns } from '@components/utils/skeletons';
 import { Translator } from '@components/utils/types';
 import { responseIsValid, setTitle } from '@components/utils/util';
-import { getCourtsLive, getStagesLive } from '@services/adapter';
+import { getStagesLive } from '@services/adapter';
 import { getTournamentResponseByEndpointName } from '@services/dashboard';
-import { getMatchLookup, getStageItemLookup, stringToColour } from '@services/lookups';
+import { getMatchLookup, getStageItemLookup } from '@services/lookups';
 
-function ScheduleRow({
-  data,
-  stageItemsLookup,
-  matchesLookup,
-}: {
-  data: any;
-  stageItemsLookup: any;
-  matchesLookup: any;
-}) {
-  const { t } = useTranslation();
-  const winColor = '#2a8f37';
-  const drawColor = '#656565';
-  const loseColor = '#af4034';
-  const team1_color =
-    data.match.stage_item_input1_score > data.match.stage_item_input2_score
-      ? winColor
-      : data.match.stage_item_input1_score === data.match.stage_item_input2_score
-        ? drawColor
-        : loseColor;
-  const team2_color =
-    data.match.stage_item_input2_score > data.match.stage_item_input1_score
-      ? winColor
-      : data.match.stage_item_input1_score === data.match.stage_item_input2_score
-        ? drawColor
-        : loseColor;
-
-  return (
-    <Card shadow="sm" radius="md" withBorder mt="md" pt="0rem">
-      <Card.Section withBorder>
-        <Grid pt="0.75rem" pb="0.5rem">
-          <Grid.Col mb="0rem" span={4}>
-            <Text pl="sm" mt="sm" fw={800}>
-              {data.match.court.name}
-            </Text>
-          </Grid.Col>
-          <Grid.Col mb="0rem" span={4}>
-            <Center>
-              <Text mt="sm" fw={800}>
-                {data.match.start_time != null ? <Time datetime={data.match.start_time} /> : null}
-              </Text>
-            </Center>
-          </Grid.Col>
-          <Grid.Col mb="0rem" span={4}>
-            <Flex justify="right">
-              <Badge
-                color={stringToColour(`${data.stageItem.id}`)}
-                variant="outline"
-                mr="md"
-                mt="0.8rem"
-                size="md"
-              >
-                {data.stageItem.name}
-              </Badge>
-            </Flex>
-          </Grid.Col>
-        </Grid>
-      </Card.Section>
-      <Stack pt="sm">
-        <Grid>
-          <Grid.Col span="auto" pb="0rem">
-            <Text fw={500}>
-              {formatMatchInput1(t, stageItemsLookup, matchesLookup, data.match)}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span="content" pb="0rem">
-            <div
-              style={{
-                backgroundColor: team1_color,
-                borderRadius: '0.5rem',
-                width: '2.5rem',
-                color: 'white',
-                fontWeight: 800,
-              }}
-            >
-              <Center>{data.match.stage_item_input1_score}</Center>
-            </div>
-          </Grid.Col>
-        </Grid>
-        <Grid mb="0rem">
-          <Grid.Col span="auto" pb="0rem">
-            <Text fw={500}>
-              {formatMatchInput2(t, stageItemsLookup, matchesLookup, data.match)}
-            </Text>
-          </Grid.Col>
-          <Grid.Col span="content" pb="0rem">
-            <div
-              style={{
-                backgroundColor: team2_color,
-                borderRadius: '0.5rem',
-                width: '2.5rem',
-                color: 'white',
-                fontWeight: 800,
-              }}
-            >
-              <Center>{data.match.stage_item_input2_score}</Center>
-            </div>
-          </Grid.Col>
-        </Grid>
-      </Stack>
-    </Card>
-  );
-}
+type Filter = 'all' | 'upcoming' | 'played';
 
 export function Schedule({
   t,
@@ -127,76 +26,94 @@ export function Schedule({
   stageItemsLookup: any;
   matchesLookup: any;
 }) {
-  const matches: any[] = Object.values(matchesLookup);
-  const sortedMatches = matches
-    .filter((m1: any) => m1.match.start_time != null)
+  const [filter, setFilter] = useState<Filter>('all');
+  const all: any[] = Object.values(matchesLookup);
+
+  const scheduled = all
+    .filter((m) => m.match.start_time != null)
     .sort(
-      (m1: any, m2: any) =>
+      (m1, m2) =>
         compareDateTime(m1.match.start_time, m2.match.start_time) ||
-        m1.match.court?.name.localeCompare(m2.match.court?.name),
+        (m1.match.court?.name ?? '').localeCompare(m2.match.court?.name ?? ''),
     );
+  const unscheduled = all.filter((m) => m.match.start_time == null);
 
-  const rows: React.JSX.Element[] = [];
+  const matchesFilter = (m: any) => {
+    if (filter === 'all') return true;
+    if (m.match.start_time == null) return filter === 'upcoming';
+    const ongoingOrFuture = isMatchHappening(m.match) || isMatchInTheFuture(m.match);
+    return filter === 'upcoming' ? ongoingOrFuture : !ongoingOrFuture;
+  };
 
-  for (let c = 0; c < sortedMatches.length; c += 1) {
-    const data = sortedMatches[c];
+  const visibleScheduled = scheduled.filter(matchesFilter);
+  const visibleUnscheduled = unscheduled.filter(matchesFilter);
 
-    if (c < 1 || sortedMatches[c - 1].match.start_time) {
-      const startTime = formatTime(data.match.start_time);
-
-      if (c < 1 || startTime !== formatTime(sortedMatches[c - 1].match.start_time)) {
-        rows.push(
-          <Center mt="md" key={`time-${c}`}>
-            <Text size="xl" fw={800}>
-              {startTime}
-            </Text>
-          </Center>,
-        );
-      }
-    }
-
-    rows.push(
-      <ScheduleRow
-        key={data.match.id}
-        data={data}
-        stageItemsLookup={stageItemsLookup}
-        matchesLookup={matchesLookup}
-      />,
+  if (all.length < 1) {
+    return (
+      <NoContent
+        title={t('public_not_started_title')}
+        description={t('public_not_started_description')}
+        icon={<IconCalendarOff size={96} stroke={1.2} />}
+      />
     );
   }
 
-  if (rows.length < 1) {
-    return <NoContent title={t('no_matches_title')} description="" icon={<AiOutlineHourglass />} />;
+  // Agrupa por día para que la lista sea fácil de recorrer.
+  const groups: { label: string; items: any[] }[] = [];
+  visibleScheduled.forEach((m) => {
+    const label = formatDayLabel(m.match.start_time);
+    const last = groups[groups.length - 1];
+    if (last != null && last.label === label) last.items.push(m);
+    else groups.push({ label, items: [m] });
+  });
+  if (visibleUnscheduled.length > 0) {
+    groups.push({ label: t('public_unscheduled'), items: visibleUnscheduled });
   }
-
-  const noItemsAlert =
-    matchesLookup.length < 1 ? (
-      <Alert
-        icon={<IconAlertCircle size={16} />}
-        title={t('no_matches_title')}
-        color="gray"
-        radius="md"
-      >
-        {t('drop_match_alert_title')}
-      </Alert>
-    ) : null;
 
   return (
-    <Group wrap="nowrap" align="top" style={{ width: '100%' }}>
-      <div style={{ width: '100%' }}>
-        {rows}
-        {noItemsAlert}
-      </div>
-    </Group>
+    <Stack gap="lg">
+      <SegmentedControl
+        fullWidth
+        value={filter}
+        onChange={(v) => setFilter(v as Filter)}
+        data={[
+          { value: 'all', label: t('public_filter_all') },
+          { value: 'upcoming', label: t('public_filter_upcoming') },
+          { value: 'played', label: t('public_filter_played') },
+        ]}
+      />
+
+      {groups.length < 1 ? (
+        <Text ta="center" c="dimmed" py="xl">
+          {t('public_no_matches_filtered')}
+        </Text>
+      ) : (
+        groups.map((group) => (
+          <Stack gap="sm" key={group.label}>
+            <Text fw={800} tt="uppercase" size="sm" c="dimmed" style={{ letterSpacing: '0.05em' }}>
+              {group.label}
+            </Text>
+            {group.items.map((data) => (
+              <MatchCard
+                key={data.match.id}
+                data={data}
+                stageItemsLookup={stageItemsLookup}
+                matchesLookup={matchesLookup}
+              />
+            ))}
+          </Stack>
+        ))
+      )}
+    </Stack>
   );
 }
+
 export default function DashboardSchedulePage() {
   const { t } = useTranslation();
   const tournamentDataFull = getTournamentResponseByEndpointName();
   const tournamentValid = !React.isValidElement(tournamentDataFull);
 
   const swrStagesResponse = getStagesLive(tournamentValid ? tournamentDataFull.id : null);
-  const swrCourtsResponse = getCourtsLive(tournamentValid ? tournamentDataFull.id : null);
 
   if (!tournamentValid) {
     return tournamentDataFull;
@@ -209,19 +126,17 @@ export default function DashboardSchedulePage() {
     : [];
   const matchesLookup = responseIsValid(swrStagesResponse) ? getMatchLookup(swrStagesResponse) : [];
 
-  // TODO: show loading icon.
-  if (!responseIsValid(swrStagesResponse)) return null;
-  if (!responseIsValid(swrCourtsResponse)) return null;
-
   return (
-    <>
-      <DoubleHeader tournamentData={tournamentDataFull} />
-      <Center>
-        <Group style={{ maxWidth: '48rem', width: '100%' }} px="1rem">
-          <Schedule t={t} matchesLookup={matchesLookup} stageItemsLookup={stageItemsLookup} />
-        </Group>
-      </Center>
-      <DashboardFooter />
-    </>
+    <DashboardShell tournamentData={tournamentDataFull}>
+      {responseIsValid(swrStagesResponse) ? (
+        <Schedule t={t} matchesLookup={matchesLookup} stageItemsLookup={stageItemsLookup} />
+      ) : swrStagesResponse.error ? (
+        <Center>
+          <Text c="dimmed">{t('public_loading_error')}</Text>
+        </Center>
+      ) : (
+        <TableSkeletonTwoColumns />
+      )}
+    </DashboardShell>
   );
 }

@@ -1,7 +1,7 @@
 .root {
   padding-top: rem(80px);
   padding-bottom: rem(120px);
-  background-color: var(--mantine-color-blue-filled);
+  background-color: var(--mantine-color-brand-filled);
 }
 
 .label {

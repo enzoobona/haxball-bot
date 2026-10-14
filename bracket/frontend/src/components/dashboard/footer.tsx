@@ -1,25 +1,40 @@
-import { Anchor, Container, Group } from '@mantine/core';
+import { Anchor, Container, Group, Text } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { BrandFooter } from '@components/navbar/_brand';
+import { DISCORD_URL, STREAM_URL } from '../../config';
 import classes from './footer.module.css';
 
-const links = [
-  { link: 'https://docs.bracketapp.nl', label: 'Website' },
-  { link: 'https://github.com/evroon/bracket', label: 'GitHub' },
-];
-
 export function DashboardFooter() {
-  const items = links.map((link) => (
-    <Anchor<'a'> c="dimmed" key={link.label} href={link.link} size="sm">
-      {link.label}
-    </Anchor>
-  ));
+  const { t } = useTranslation();
 
   return (
     <div className={classes.footer}>
-      <Container className={classes.inner}>
+      <Container size="lg" className={classes.inner}>
         <BrandFooter />
-        <Group className={classes.links}>{items}</Group>
+        <Group className={classes.links} gap="lg">
+          {STREAM_URL ? (
+            <Anchor c="dimmed" href={STREAM_URL} size="sm" target="_blank" rel="noreferrer">
+              {t('public_watch_stream')}
+            </Anchor>
+          ) : null}
+          {DISCORD_URL ? (
+            <Anchor c="dimmed" href={DISCORD_URL} size="sm" target="_blank" rel="noreferrer">
+              {t('public_join_discord')}
+            </Anchor>
+          ) : null}
+          <Text c="dimmed" size="xs">
+            <Anchor
+              c="dimmed"
+              href="https://github.com/evroon/bracket"
+              size="xs"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('public_powered_by')}
+            </Anchor>
+          </Text>
+        </Group>
       </Container>
     </div>
   );

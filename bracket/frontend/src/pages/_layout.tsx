@@ -1,21 +1,13 @@
-import {
-  ActionIcon,
-  AppShell,
-  Burger,
-  Center,
-  Container,
-  Group,
-  Menu,
-  useComputedColorScheme,
-  useMantineColorScheme,
-} from '@mantine/core';
+import { AppShell, Burger, Center, Container, Group, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Icon, IconMoonStars, IconSun } from '@tabler/icons-react';
+import { Icon } from '@tabler/icons-react';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
 import { Brand } from '@components/navbar/_brand';
 import { getBaseLinks, getBaseLinksDict } from '@components/navbar/_main_links';
+import { ColorSchemeToggle } from '@components/utils/color_scheme_toggle';
 import PreloadLink from '@components/utils/link';
 import classes from './_layout.module.css';
 
@@ -58,12 +50,11 @@ function getMenuItemsForLink(link: HeaderActionLink, _classes: any, pathName: st
 }
 
 export function HeaderAction({ links, navbarState, breadcrumbs }: HeaderActionProps) {
+  const { t } = useTranslation();
   const location = useLocation();
   const pathName = location.pathname;
 
   const [opened, { toggle }] = navbarState != null ? navbarState : [false, { toggle: () => {} }];
-  const { setColorScheme } = useMantineColorScheme();
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
   const items = links.map((link) => {
     if (link.links) {
@@ -85,7 +76,14 @@ export function HeaderAction({ links, navbarState, breadcrumbs }: HeaderActionPr
     <AppShell.Header>
       <Container className={classes.inner} fluid>
         <Center>
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" mr="xs" />
+          <Burger
+            opened={opened}
+            onClick={toggle}
+            hiddenFrom="sm"
+            size="sm"
+            mr="xs"
+            aria-label={t('menu_label')}
+          />
           <Brand />
           <Group visibleFrom="md" mt="0.2rem">
             {breadcrumbs}
@@ -93,15 +91,7 @@ export function HeaderAction({ links, navbarState, breadcrumbs }: HeaderActionPr
         </Center>
         <Group gap={5} visibleFrom="sm">
           {items}
-          <ActionIcon
-            variant="default"
-            onClick={() => setColorScheme(computedColorScheme === 'light' ? 'dark' : 'light')}
-            size={30}
-            ml="1rem"
-          >
-            <IconSun size={16} className={classes.light} />
-            <IconMoonStars size={16} className={classes.dark} />
-          </ActionIcon>
+          <ColorSchemeToggle size={30} />
         </Group>
       </Container>
     </AppShell.Header>

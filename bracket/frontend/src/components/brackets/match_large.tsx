@@ -17,16 +17,14 @@ export default function MatchLarge({
         <Grid align="center">
           <Grid.Col span={{ sm: 9 }}>
             <Text lineClamp={1} inherit>
-              {formatStageItemInput(
-                assert_not_none(match.stage_item_input1),
-                stageItemsLookup,
-              ) || <i>N/A</i>}
+              {formatStageItemInput(assert_not_none(match.stage_item_input1), stageItemsLookup) || (
+                <i>N/A</i>
+              )}
             </Text>
             <Text lineClamp={1} inherit>
-              {formatStageItemInput(
-                assert_not_none(match.stage_item_input2),
-                stageItemsLookup,
-              ) || <i>N/A</i>}
+              {formatStageItemInput(assert_not_none(match.stage_item_input2), stageItemsLookup) || (
+                <i>N/A</i>
+              )}
             </Text>
           </Grid.Col>
           <Grid.Col span={{ sm: 3 }}>

@@ -70,7 +70,7 @@ export default function ClubModal({
             {...form.getInputProps('name')}
           />
 
-          <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+          <Button fullWidth style={{ marginTop: 10 }} type="submit">
             {t('save_button')}
           </Button>
         </form>

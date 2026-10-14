@@ -56,11 +56,13 @@ export default function LoginPage() {
   return (
     <>
       <Title ta="center" mt={100}>
-        {t('welcome_title')}{' '}
-        <Text inherit variant="gradient" component="span">
-          Bracket
-        </Text>
+        {t('login_admin_title')}
       </Title>
+      <Text ta="center" mt="xs">
+        <Anchor<'a'> onClick={() => navigate('/')} size="sm" c="dimmed">
+          {t('back_to_site')}
+        </Anchor>
+      </Text>
       <Container size={480} my={40}>
         <Paper withBorder shadow="md" p={30} pt={8} mt={30} radius="md">
           {/*<Button*/}

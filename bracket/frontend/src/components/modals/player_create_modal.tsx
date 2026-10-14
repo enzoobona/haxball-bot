@@ -45,7 +45,7 @@ function MultiPlayerTab({
         label={t('active_players_checkbox_label')}
         {...form.getInputProps('active', { type: 'checkbox' })}
       />
-      <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+      <Button fullWidth style={{ marginTop: 10 }} type="submit">
         {t('save_players_button')}
       </Button>
     </form>
@@ -93,7 +93,7 @@ function SinglePlayerTab({
         {...form.getInputProps('active', { type: 'checkbox' })}
       />
 
-      <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+      <Button fullWidth style={{ marginTop: 10 }} type="submit">
         {t('save_players_button')}
       </Button>
     </form>

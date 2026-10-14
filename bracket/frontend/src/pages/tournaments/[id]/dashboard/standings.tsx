@@ -4,8 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SWRResponse } from 'swr';
 
-import { DashboardFooter } from '@components/dashboard/footer';
-import { DoubleHeader, getTournamentHeadTitle } from '@components/dashboard/layout';
+import { DashboardShell, getTournamentHeadTitle } from '@components/dashboard/layout';
 import { NoContent } from '@components/no_content/empty_table_info';
 import { StandingsTableForStageItem } from '@components/tables/standings';
 import { TableSkeletonTwoColumns } from '@components/utils/skeletons';
@@ -15,16 +14,16 @@ import { getStagesLive } from '@services/adapter';
 import { getTournamentResponseByEndpointName } from '@services/dashboard';
 import { getStageItemLookup, getStageItemTeamsLookup } from '@services/lookups';
 
-function getStageTypeLabel(stageItem: StageItemWithRounds) {
+function getStageTypeLabel(t: (key: string) => string, stageItem: StageItemWithRounds) {
   switch (stageItem.type) {
     case 'ROUND_ROBIN':
-      return 'ROUND ROBIN';
+      return t('round_robin_badge');
 
     case 'SINGLE_ELIMINATION':
-      return 'ELIMINACIÓN';
+      return t('single_elimination_badge');
 
     case 'SWISS':
-      return 'SUIZO';
+      return t('swiss_badge');
 
     default:
       return stageItem.type;
@@ -32,14 +31,15 @@ function getStageTypeLabel(stageItem: StageItemWithRounds) {
 }
 
 function StageHeader({ stageItem }: { stageItem: StageItemWithRounds }) {
+  const { t } = useTranslation();
   return (
-    <Group justify="space-between" align="center" mb="sm" mt="xl">
+    <Group justify="space-between" align="center" mb="sm" wrap="nowrap">
       <Text size="xl" fw={700} inherit>
         {stageItem.name}
       </Text>
 
-      <Badge variant="light" size="lg" radius="md">
-        {getStageTypeLabel(stageItem)}
+      <Badge variant="light" size="lg" radius="md" style={{ flexShrink: 0 }}>
+        {getStageTypeLabel(t, stageItem)}
       </Badge>
     </Group>
   );
@@ -71,14 +71,7 @@ export function StandingsContent({
       const stageItem = stageItemsLookup[stageItemId];
 
       return (
-        <Paper
-          key={stageItemId}
-          withBorder
-          radius="lg"
-          p="md"
-          mb="lg"
-          shadow="xs"
-        >
+        <Paper key={stageItemId} withBorder radius="lg" p={{ base: 'xs', sm: 'md' }} mb="lg">
           <StageHeader stageItem={stageItem} />
 
           <StandingsTableForStageItem
@@ -109,9 +102,7 @@ export default function DashboardStandingsPage() {
   const tournamentDataFull = getTournamentResponseByEndpointName();
   const tournamentValid = !React.isValidElement(tournamentDataFull);
 
-  const swrStagesResponse = getStagesLive(
-    tournamentValid ? tournamentDataFull.id : null,
-  );
+  const swrStagesResponse = getStagesLive(tournamentValid ? tournamentDataFull.id : null);
 
   if (!tournamentValid) {
     return tournamentDataFull;
@@ -119,23 +110,17 @@ export default function DashboardStandingsPage() {
 
   setTitle(getTournamentHeadTitle(tournamentDataFull));
 
-  if (swrStagesResponse.isLoading) {
-    return <TableSkeletonTwoColumns />;
-  }
-
   return (
-    <>
-      <DoubleHeader tournamentData={tournamentDataFull} />
-
-      <div style={{ fontSize: '16px' }}>
+    <DashboardShell tournamentData={tournamentDataFull} size="lg">
+      {swrStagesResponse.isLoading ? (
+        <TableSkeletonTwoColumns />
+      ) : (
         <StandingsContent
           swrStagesResponse={swrStagesResponse}
           fontSizeInPixels={16}
           maxTeamsToDisplay={100}
         />
-      </div>
-
-      <DashboardFooter />
-    </>
+      )}
+    </DashboardShell>
   );
 }

@@ -78,7 +78,7 @@ export default function LadderFixed({
               value={(progress.scheduledMatchesCount * 100) / progress.courtsCount}
               miw="12rem"
               striped
-              color="indigo"
+              color="burgundy"
             />
           </Stack>
         </>

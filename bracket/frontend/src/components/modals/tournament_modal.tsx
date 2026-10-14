@@ -121,7 +121,7 @@ function GeneralTournamentForm({
         <Grid.Col span={{ sm: 3 }}>
           <Button
             fullWidth
-            color="indigo"
+            color="burgundy"
             leftSection={<IconCalendarTime size="1.1rem" stroke={1.5} />}
             onClick={() => {
               form.setFieldValue('start_time', dayjs());
@@ -165,7 +165,7 @@ function GeneralTournamentForm({
         {...form.getInputProps('auto_assign_courts', { type: 'checkbox' })}
       />
 
-      <Button fullWidth mt={8} color="green" type="submit">
+      <Button fullWidth mt={8} type="submit">
         {t('save_button')}
       </Button>
     </form>

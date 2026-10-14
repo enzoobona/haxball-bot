@@ -15,7 +15,7 @@ export default function TournamentLayout({ children, tournament_id }: any) {
 
   const tournamentLinks = <TournamentLinks tournament_id={tournament_id} />;
   const breadcrumbs = responseIsValid(tournamentResponse) ? (
-    <Group gap="xs" miw="25rem">
+    <Group gap="xs">
       <Title order={2} maw="20rem">
         /
       </Title>

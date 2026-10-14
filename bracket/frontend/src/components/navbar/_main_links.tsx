@@ -15,6 +15,7 @@ import {
   IconUser,
   IconUsers,
   IconListNumbers,
+  IconWorld,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -61,11 +62,7 @@ function MainLink({ item, pathName }: { item: MainLinkProps; pathName: String })
           component={PreloadLink}
           href={item.link}
           className={classes.link}
-          data-active={
-            pathName === item.link ||
-            pathName.startsWith(`${item.link}/`) ||
-            undefined
-          }
+          data-active={pathName === item.link || pathName.startsWith(`${item.link}/`) || undefined}
         >
           <item.icon stroke={1.5} />
         </UnstyledButton>
@@ -80,6 +77,7 @@ export function getBaseLinksDict() {
 
   return [
     { link: '/clubs', label: capitalize(t('clubs_title')), links: [], icon: IconUsers },
+    { link: '/torneos', label: t('public_site_view'), links: [], icon: IconWorld },
     { link: '/', label: capitalize(t('tournaments_title')), links: [], icon: IconHome },
     {
       link: '/user',

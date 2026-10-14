@@ -74,7 +74,7 @@ export default function CourtsPresentPage() {
           <Grid align="center" gutter="2rem">
             <Grid.Col span={{ sm: 2 }} />
             <Grid.Col span={{ sm: 5 }}>
-              <CourtBadge name={t('current_matches_badge')} color="teal" />
+              <CourtBadge name={t('current_matches_badge')} color="brand" />
             </Grid.Col>
             <Grid.Col span={{ sm: 5 }}>
               <CourtBadge name={t('next_matches_badge')} color="gray" />

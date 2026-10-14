@@ -1,0 +1,31 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-8));
+  border-bottom: rem(2px) solid var(--mantine-color-brand-filled);
+}
+
+.inner {
+  height: rem(60px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-sm);
+}
+
+.admin {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}

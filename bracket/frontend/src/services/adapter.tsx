@@ -22,14 +22,15 @@ import {
   UserPublicResponse,
 } from '@openapi';
 import dayjs from 'dayjs';
+import i18n from 'i18next';
 import { getLogin, performLogout, tokenPresent } from './local_storage';
 
 export function handleRequestError(response: AxiosError) {
   if (response.code === 'ERR_NETWORK') {
     showNotification({
       color: 'red',
-      title: 'An error occurred',
-      message: 'Internal server error',
+      title: i18n.t('error_title'),
+      message: i18n.t('internal_server_error'),
       autoClose: 10000,
     });
     return;
@@ -51,7 +52,7 @@ export function handleRequestError(response: AxiosError) {
 
     showNotification({
       color: 'red',
-      title: 'An error occurred',
+      title: i18n.t('error_title'),
       message,
       autoClose: 10000,
     });
@@ -71,11 +72,12 @@ export function getBaseApiUrl() {
 
 export function createAxios() {
   const user = getLogin();
-  const access_token = user != null ? user.access_token : '';
+  const access_token = user != null ? user.access_token : null;
+  // Los visitantes (sin sesión) no mandan el header `Authorization`.
   return axios.create({
     baseURL: getBaseApiUrl(),
     headers: {
-      Authorization: `bearer ${access_token}`,
+      ...(access_token ? { Authorization: `bearer ${access_token}` } : {}),
       Accept: 'application/json',
     },
   });
@@ -122,6 +124,10 @@ export function getTournamentByEndpointName(
   tournament_endpoint_name: string,
 ): SWRResponse<TournamentsResponse> {
   return useSWR(`tournaments?endpoint_name=${tournament_endpoint_name}`, fetcher);
+}
+
+export function getPublicTournaments(): SWRResponse<TournamentsResponse> {
+  return useSWR('public/tournaments', fetcher, { refreshInterval: 60_000 });
 }
 
 export function getTournamentById(tournament_id: number): SWRResponse<TournamentResponse> {
@@ -190,9 +196,13 @@ export function getTeamsPaginated(
 }
 
 export function getTeamsLive(tournament_id: number | null): SWRResponse<TeamsWithPlayersResponse> {
-  return useSWR(tournament_id == null ? null : `tournaments/${tournament_id}/teams`, fetcher, {
-    refreshInterval: 5_000,
-  });
+  return useSWR(
+    tournament_id == null ? null : `tournaments/${tournament_id}/teams?limit=100`,
+    fetcher,
+    {
+      refreshInterval: 15_000,
+    },
+  );
 }
 
 export function getAvailableStageItemInputs(

@@ -1,5 +1,4 @@
 import { Center, Grid, UnstyledButton, useMantineTheme } from '@mantine/core';
-import { useColorScheme } from '@mantine/hooks';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SWRResponse } from 'swr';
@@ -15,13 +14,13 @@ import classes from './match.module.css';
 
 export function MatchBadge({ match, theme }: { match: MatchWithDetails; theme: any }) {
   const visibility = match.court ? 'visible' : 'hidden';
-  const badgeColor = useColorScheme() ? theme.colors.blue[7] : theme.colors.blue[7];
+  const badgeColor = theme.colors.burgundy[7];
   return (
     <Center style={{ transform: 'translateY(0%)', visibility }}>
       <div
         style={{
           width: '75%',
-          backgroundColor: isMatchHappening(match) ? theme.colors.grape[9] : badgeColor,
+          backgroundColor: isMatchHappening(match) ? theme.colors.brand[7] : badgeColor,
           borderRadius: '8px 8px 0px 0px',
           padding: '4px 12px 4px 12px',
         }}
@@ -56,7 +55,8 @@ export default function Match({
   const { t } = useTranslation();
   const theme = useMantineTheme();
   const winner_style = {
-    backgroundColor: theme.colors.green[9],
+    backgroundColor: theme.colors.brand[8],
+    color: theme.white,
   };
 
   const stageItemsLookup = getStageItemLookup(swrStagesResponse);

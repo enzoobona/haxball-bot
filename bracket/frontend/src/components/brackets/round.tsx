@@ -1,4 +1,4 @@
-import { Center, Grid, Title } from '@mantine/core';
+import { Center, Title } from '@mantine/core';
 import { SWRResponse } from 'swr';
 
 import RoundModal from '@components/modals/round_modal';
@@ -47,11 +47,11 @@ export default function RoundComponent({
   const active_round_style = round.is_draft
     ? {
         borderStyle: 'dashed',
-        borderColor: 'gray',
+        borderColor: 'var(--mantine-color-dark-3)',
       }
     : {
         borderStyle: 'solid',
-        borderColor: 'gray',
+        borderColor: 'var(--mantine-color-dark-4)',
       };
 
   const modal = readOnly ? (
@@ -85,17 +85,18 @@ export default function RoundComponent({
   );
 
   if (readOnly) {
-    return (
-      <Grid.Col
-        style={{ minHeight: 320, maxWidth: 500, marginRight: '1rem', marginBottom: '1rem' }}
-      >
-        {item}
-      </Grid.Col>
-    );
+    return <div style={{ minHeight: 320, width: '100%', marginBottom: '1rem' }}>{item}</div>;
   }
 
   return (
-    <div style={{ minHeight: 320, width: 400, marginRight: '1rem', marginBottom: '1rem' }}>
+    <div
+      style={{
+        minHeight: 320,
+        width: 'min(400px, 100%)',
+        marginRight: '1rem',
+        marginBottom: '1rem',
+      }}
+    >
       {item}
     </div>
   );

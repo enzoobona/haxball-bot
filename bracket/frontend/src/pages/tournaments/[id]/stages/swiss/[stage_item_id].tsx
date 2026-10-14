@@ -183,7 +183,7 @@ export default function SwissTournamentPage() {
             {tournamentDataFull?.dashboard_endpoint && (
               <Button
                 className={classes.fullWithMobile}
-                color="blue"
+                color="brand"
                 size="sm"
                 variant="outline"
                 leftSection={<IconExternalLink size={24} />}

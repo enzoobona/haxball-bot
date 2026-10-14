@@ -28,7 +28,7 @@ function RankingDeleteButton({
   if (ranking.position === 0) {
     return (
       <Center ml="1rem" miw="10rem">
-        <Badge color="indigo">{t('default_ranking_badge')}</Badge>
+        <Badge color="burgundy">{t('default_ranking_badge')}</Badge>
       </Center>
     );
   }
@@ -119,7 +119,7 @@ function EditRankingForm({
             label={t('add_score_points_label')}
             {...form.getInputProps('add_score_points', { type: 'checkbox' })}
           />
-          <Button fullWidth style={{ marginTop: 16 }} color="green" type="submit">
+          <Button fullWidth style={{ marginTop: 16 }} type="submit">
             {`${t('save_button')} ${rankingTitle}`}
           </Button>
         </Accordion.Panel>

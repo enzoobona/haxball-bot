@@ -200,7 +200,7 @@ function GeneralTournamentForm({
           <Grid.Col span={{ sm: 3 }}>
             <Button
               fullWidth
-              color="indigo"
+              color="burgundy"
               leftSection={<IconCalendarTime size="1.1rem" stroke={1.5} />}
               onClick={() => {
                 form.setFieldValue('start_time', dayjs());
@@ -246,7 +246,7 @@ function GeneralTournamentForm({
                   disabled={form.values.dashboard_endpoint === ''}
                   leftSection={<IconCopy size="1.1rem" stroke={1.5} />}
                   fullWidth
-                  color={copied ? 'teal' : 'indigo'}
+                  color={copied ? 'dark' : 'burgundy'}
                   onClick={copy}
                 >
                   {copied ? t('copied_url_button') : t('copy_url_button')}

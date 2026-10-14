@@ -1,4 +1,4 @@
-import { MantineProvider, createTheme } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
@@ -25,6 +25,11 @@ import DashboardNotFoundPage from './pages/tournaments/[id]/dashboard/dashboard_
 import CourtsPresentPage from './pages/tournaments/[id]/dashboard/present/courts';
 import StandingsPresentPage from './pages/tournaments/[id]/dashboard/present/standings';
 import DashboardStandingsPage from './pages/tournaments/[id]/dashboard/standings';
+import DashboardBracketPage from './pages/tournaments/[id]/dashboard/bracket';
+import DashboardTeamsPage from './pages/tournaments/[id]/dashboard/teams';
+import PublicHomePage from './pages/public_home';
+import { tokenPresent } from '@services/local_storage';
+import { theme } from './theme';
 import PlayersPage from './pages/tournaments/[id]/players';
 import RankingsPage from './pages/tournaments/[id]/rankings';
 import ResultsPage from './pages/tournaments/[id]/results';
@@ -37,23 +42,6 @@ import UserPage from './pages/user';
 
 import PlayersStatsPage from './pages/tournaments/[id]/players_stats';
 import StandingsPage from './pages/tournaments/[id]/standings';
-
-const theme = createTheme({
-  colors: {
-    dark: [
-      '#C1C2C5',
-      '#A6A7AB',
-      '#909296',
-      '#5c5f66',
-      '#373A40',
-      '#2C2E33',
-      '#25262b',
-      '#1A1B1E',
-      '#141517',
-      '#101113',
-    ],
-  },
-});
 
 function AnalyticsScript() {
   if (import.meta.env.VITE_ANALYTICS_SCRIPT_SRC == null) {
@@ -73,11 +61,12 @@ createRoot(document.getElementById('root')!).render(
     <NuqsAdapter>
       <BrowserRouter>
         <I18nextProvider i18n={i18n}>
-          <MantineProvider defaultColorScheme="auto" theme={theme}>
-            <BracketSpotlight />
+          <MantineProvider defaultColorScheme="dark" theme={theme}>
+            {tokenPresent() ? <BracketSpotlight /> : null}
             <Notifications />
             <Routes>
               <Route index element={<HomePage />} />
+              <Route path="/torneos" element={<PublicHomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/clubs" element={<ClubsPage />} />
               <Route path="/demo" element={<CreateDemoAccountPage />} />
@@ -101,7 +90,9 @@ createRoot(document.getElementById('root')!).render(
                   </Route>
                   <Route path="dashboard">
                     <Route index element={<DashboardSchedulePage />} />
+                    <Route path="bracket" element={<DashboardBracketPage />} />
                     <Route path="standings" element={<DashboardStandingsPage />} />
+                    <Route path="teams" element={<DashboardTeamsPage />} />
                     <Route path="present">
                       <Route path="courts" element={<CourtsPresentPage />} />
                       <Route path="standings" element={<StandingsPresentPage />} />

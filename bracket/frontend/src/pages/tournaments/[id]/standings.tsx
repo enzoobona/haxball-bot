@@ -14,9 +14,7 @@ export default function StandingsPage() {
 
   return (
     <TournamentLayout tournament_id={tournamentData.id}>
-      <Title mb="md">
-        {capitalize(t('standings_title'))}
-      </Title>
+      <Title mb="md">{capitalize(t('standings_title'))}</Title>
 
       <StandingsContent
         swrStagesResponse={swrStagesResponse}

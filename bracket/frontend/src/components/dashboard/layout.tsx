@@ -1,20 +1,33 @@
 import {
-  Box,
+  Anchor,
+  Badge,
   Center,
   Container,
   Group,
   Image,
   Skeleton,
+  Text,
   Title,
-  UnstyledButton,
 } from '@mantine/core';
+import {
+  IconArrowLeft,
+  IconBrackets,
+  IconCalendar,
+  IconListNumbers,
+  IconUsers,
+} from '@tabler/icons-react';
+import i18n from 'i18next';
+import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useLocation } from 'react-router';
 
+import PublicLayout from '@components/public/public_layout';
 import PreloadLink from '@components/utils/link';
 import { getBaseURL } from '@components/utils/util';
 import { Tournament } from '@openapi';
 import { getBaseApiUrl } from '@services/adapter';
+import { SITE_NAME } from '../../config';
 import classes from './layout.module.css';
 
 export function TournamentQRCode({ tournamentDataFull }: { tournamentDataFull: Tournament }) {
@@ -54,7 +67,7 @@ export function TournamentLogo({ tournamentDataFull }: { tournamentDataFull: Tou
       <Image
         radius="lg"
         mt="1rem"
-        alt="Logo of the tournament"
+        alt={i18n.t('logo_alt_tournament')}
         src={`${getBaseApiUrl()}/static/tournament-logos/${tournamentDataFull.logo_path}`}
         style={{ maxWidth: '400px' }}
       />
@@ -63,7 +76,7 @@ export function TournamentLogo({ tournamentDataFull }: { tournamentDataFull: Tou
 }
 
 export function getTournamentHeadTitle(tournamentDataFull: Tournament) {
-  return tournamentDataFull !== null ? `Bracket | ${tournamentDataFull.name}` : 'Bracket';
+  return tournamentDataFull !== null ? `${tournamentDataFull.name} | ${SITE_NAME}` : SITE_NAME;
 }
 
 export function TournamentTitle({ tournamentDataFull }: { tournamentDataFull: Tournament }) {
@@ -75,40 +88,89 @@ export function TournamentTitle({ tournamentDataFull }: { tournamentDataFull: To
 }
 
 export function DoubleHeader({ tournamentData }: { tournamentData: Tournament }) {
-  const navigate = useLocation();
+  const { t } = useTranslation();
+  const location = useLocation();
   const endpoint = tournamentData.dashboard_endpoint || '';
-  const pathName = navigate.pathname.replace('[id]', endpoint).replace(/\/+$/, '');
+  const base = `/tournaments/${endpoint}/dashboard`;
+  const pathName = location.pathname.replace('[id]', endpoint).replace(/\/+$/, '');
+  const finished = tournamentData.status === 'ARCHIVED';
 
-  const mainLinks = [
-    { link: `/tournaments/${endpoint}/dashboard`, label: 'Matches' },
-    { link: `/tournaments/${endpoint}/dashboard/standings`, label: 'Standings' },
+  const tabs = [
+    { link: base, label: t('matches_title'), icon: IconCalendar },
+    { link: `${base}/bracket`, label: t('bracket_title'), icon: IconBrackets },
+    { link: `${base}/standings`, label: t('standings_title'), icon: IconListNumbers },
+    { link: `${base}/teams`, label: t('public_teams_title'), icon: IconUsers },
   ];
-
-  const mainItems = mainLinks.map((item) => (
-    <PreloadLink
-      href={item.link}
-      key={item.label}
-      className={classes.mainLink}
-      data-active={item.link === pathName || undefined}
-    >
-      {item.label}
-    </PreloadLink>
-  ));
 
   return (
     <header className={classes.header}>
-      <Container className={classes.inner}>
-        <UnstyledButton component={PreloadLink} href={`/tournaments/${endpoint}/dashboard`}>
-          <Title size="lg" lineClamp={1}>
-            {tournamentData.name}
-          </Title>
-        </UnstyledButton>
-        <Box className={classes.links}>
-          <Group gap={0} className={classes.mainLinks}>
-            {mainItems}
-          </Group>
-        </Box>
+      <Container size="lg" pt="md">
+        <Anchor component={PreloadLink} href="/" size="sm" c="dimmed" className={classes.back}>
+          <IconArrowLeft size={14} />
+          {t('public_back_to_tournaments')}
+        </Anchor>
+
+        <Group wrap="nowrap" gap="md" mt="sm" align="center">
+          {tournamentData.logo_path ? (
+            <Image
+              className={classes.logo}
+              src={`${getBaseApiUrl()}/static/tournament-logos/${tournamentData.logo_path}`}
+              alt={i18n.t('logo_alt_tournament')}
+            />
+          ) : null}
+          <div style={{ minWidth: 0 }}>
+            <Title order={1} className={classes.title}>
+              {tournamentData.name}
+            </Title>
+            <Group gap="xs" mt={6}>
+              <Badge color={finished ? 'gray' : 'brand'} variant={finished ? 'light' : 'filled'}>
+                {finished ? t('public_archived_badge') : t('public_open_badge')}
+              </Badge>
+              {finished ? null : (
+                <Text size="xs" c="dimmed">
+                  {t('public_updates_automatically')}
+                </Text>
+              )}
+            </Group>
+          </div>
+        </Group>
+      </Container>
+
+      <Container size="lg">
+        <nav className={classes.tabs} aria-label={tournamentData.name}>
+          {tabs.map((tab) => (
+            <PreloadLink
+              href={tab.link}
+              key={tab.link}
+              className={classes.tab}
+              data-active={tab.link === pathName || undefined}
+            >
+              <tab.icon size={18} stroke={1.8} />
+              <span>{tab.label}</span>
+            </PreloadLink>
+          ))}
+        </nav>
       </Container>
     </header>
+  );
+}
+
+// Estructura común de todas las pantallas públicas de un torneo.
+export function DashboardShell({
+  tournamentData,
+  children,
+  size = 'md',
+}: {
+  tournamentData: Tournament;
+  children: ReactNode;
+  size?: 'sm' | 'md' | 'lg';
+}) {
+  return (
+    <PublicLayout>
+      <DoubleHeader tournamentData={tournamentData} />
+      <Container size={size} py="lg">
+        {children}
+      </Container>
+    </PublicLayout>
   );
 }

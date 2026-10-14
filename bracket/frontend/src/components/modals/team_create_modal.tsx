@@ -51,7 +51,7 @@ function MultiTeamTab({
         label={t('active_teams_checkbox_label')}
         {...form.getInputProps('active', { type: 'checkbox' })}
       />
-      <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+      <Button fullWidth style={{ marginTop: 10 }} type="submit">
         {t('save_button')}
       </Button>
     </form>
@@ -120,7 +120,7 @@ function SingleTeamTab({
 
       <TeamStyleFields form={form} />
 
-      <Button fullWidth style={{ marginTop: 10 }} color="green" type="submit">
+      <Button fullWidth style={{ marginTop: 10 }} type="submit">
         {t('save_button')}
       </Button>
     </form>
@@ -138,7 +138,7 @@ export default function TeamCreateModal({
   const [opened, setOpened] = useState(false);
   return (
     <>
-      <Modal opened={opened} onClose={() => setOpened(false)} title="Create Team">
+      <Modal opened={opened} onClose={() => setOpened(false)} title={t('create_team_title')}>
         <Tabs defaultValue="single">
           <Tabs.List justify="center" grow>
             <Tabs.Tab value="single" leftSection={<IconUser size="0.8rem" />}>

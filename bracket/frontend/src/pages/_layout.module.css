@@ -27,11 +27,11 @@
   }
 
   &[data-active] {
-    background-color: var(--mantine-color-blue-7);
+    background-color: var(--mantine-color-brand-filled);
     color: var(--mantine-color-white);
 
     &:hover {
-      background-color: var(--mantine-color-blue-9);
+      background-color: var(--mantine-color-brand-8);
     }
   }
 }

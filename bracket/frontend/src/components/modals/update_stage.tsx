@@ -42,7 +42,7 @@ export function UpdateStageModal({
           type="text"
           {...form.getInputProps('name')}
         />
-        <Button fullWidth style={{ marginTop: 16 }} color="green" type="submit">
+        <Button fullWidth style={{ marginTop: 16 }} type="submit">
           {t('save_button')}
         </Button>
       </form>

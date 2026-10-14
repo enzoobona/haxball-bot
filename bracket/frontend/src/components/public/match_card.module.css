@@ -1,0 +1,59 @@
+.card {
+  overflow: hidden;
+  background: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+
+  &[data-live] {
+    border-color: var(--mantine-color-brand-filled);
+    box-shadow: 0 0 0 1px var(--mantine-color-brand-filled);
+  }
+}
+
+.head {
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+  border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mantine-spacing-sm);
+}
+
+.teamName {
+  min-width: 0;
+  font-weight: 500;
+
+  &[data-state='win'] {
+    font-weight: 800;
+  }
+  &[data-state='lose'] {
+    color: var(--mantine-color-dimmed);
+  }
+}
+
+.score {
+  min-width: rem(40px);
+  padding: rem(2px) rem(10px);
+  text-align: center;
+  font-weight: 800;
+  border-radius: var(--mantine-radius-md);
+  color: light-dark(var(--mantine-color-dark-7), var(--mantine-color-white));
+  background: light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-4));
+
+  &[data-state='win'] {
+    color: var(--mantine-color-white);
+    background: var(--mantine-color-brand-filled);
+  }
+  &[data-state='lose'] {
+    color: var(--mantine-color-dimmed);
+  }
+}

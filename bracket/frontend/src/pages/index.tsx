@@ -7,10 +7,12 @@ import TournamentModal from '@components/modals/tournament_modal';
 import { TournamentFilter } from '@components/utils/tournament';
 import { capitalize } from '@components/utils/util';
 import { checkForAuthError, getTournaments } from '@services/adapter';
+import { tokenPresent } from '@services/local_storage';
 import Layout from './_layout';
 import classes from './index.module.css';
+import PublicHomePage from './public_home';
 
-export default function HomePage() {
+function AdminHomePage() {
   const { t } = useTranslation();
   const [filter, setFilter] = useState<TournamentFilter>('OPEN');
 
@@ -26,11 +28,11 @@ export default function HomePage() {
         <Grid.Col span="content" className={classes.fullWithMobile}>
           <Select
             size="md"
-            placeholder="Pick value"
+            placeholder={t('pick_value_placeholder')}
             data={[
-              { label: 'All', value: 'ALL' },
-              { label: 'Archived', value: 'ARCHIVED' },
-              { label: 'Open', value: 'OPEN' },
+              { label: t('filter_all'), value: 'ALL' },
+              { label: t('filter_archived'), value: 'ARCHIVED' },
+              { label: t('filter_open'), value: 'OPEN' },
             ]}
             allowDeselect={false}
             value={filter}
@@ -45,4 +47,9 @@ export default function HomePage() {
       <TournamentsCardTable swrTournamentsResponse={swrTournamentsResponse} />
     </Layout>
   );
+}
+
+// Quien no inició sesión ve la portada pública; el organizador (con sesión) ve su panel.
+export default function HomePage() {
+  return tokenPresent() ? <AdminHomePage /> : <PublicHomePage />;
 }

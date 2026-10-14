@@ -1,50 +1,70 @@
 .header {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  width: 100%;
-  background-color: var(--mantine-color-body);
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
   border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
-.inner {
-  @media (min-width: 25rem) {
-    display: flex;
-  }
-  margin: auto;
-  height: 100%;
+.back {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
 }
 
-.links {
-  min-width: 11rem;
-  flex-direction: column;
-  justify-content: space-between;
+.logo {
+  width: rem(64px);
+  height: rem(64px);
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: var(--mantine-radius-md);
+
+  @media (max-width: $mantine-breakpoint-xs) {
+    width: rem(48px);
+    height: rem(48px);
+  }
 }
 
-.mainLinks {
-  margin-right: calc(var(--mantine-spacing-sm) * -1);
-}
-
-.mainLink {
+.title {
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
+  line-height: 1.1;
   text-transform: uppercase;
-  font-size: var(--mantine-font-size-xs);
-  color: light-dark(var(--mantine-color-gray-6), var(--mantine-color-dark-1));
-  padding: rem(7px) var(--mantine-spacing-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Pestañas: en pantallas chicas se desplazan horizontalmente en vez de romper el layout. */
+.tabs {
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+  margin-top: var(--mantine-spacing-md);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: rem(10px) var(--mantine-spacing-md);
+  font-size: var(--mantine-font-size-sm);
   font-weight: 700;
-  border-bottom: rem(2px) solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   text-decoration: none;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
+  border-bottom: rem(3px) solid transparent;
   transition:
-    border-color 200ms ease,
-    color 100ms ease;
+    color 120ms ease,
+    border-color 120ms ease;
 
   @mixin hover {
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    text-decoration: none;
   }
 
   &[data-active] {
     color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-    border-bottom-color: var(--mantine-color-blue-6);
+    border-bottom-color: var(--mantine-color-brand-filled);
   }
 }

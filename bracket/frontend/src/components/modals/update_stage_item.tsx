@@ -49,7 +49,7 @@ export function UpdateStageItemModal({
           {...form.getInputProps('name')}
         />
         <RankingSelect form={form} rankings={rankings} />
-        <Button fullWidth style={{ marginTop: 16 }} color="green" type="submit">
+        <Button fullWidth style={{ marginTop: 16 }} type="submit">
           {t('save_button')}
         </Button>
       </form>

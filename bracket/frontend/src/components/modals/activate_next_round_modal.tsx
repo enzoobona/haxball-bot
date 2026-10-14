@@ -78,7 +78,7 @@ export default function ActivateNextRoundModal({
           />
           <Button
             fullWidth
-            color="indigo"
+            color="burgundy"
             size="md"
             mt="lg"
             type="submit"
@@ -90,7 +90,7 @@ export default function ActivateNextRoundModal({
       </Modal>
 
       <Button
-        color="indigo"
+        color="burgundy"
         size="md"
         variant="outline"
         leftSection={<MdOutlineAutoFixHigh size={24} />}

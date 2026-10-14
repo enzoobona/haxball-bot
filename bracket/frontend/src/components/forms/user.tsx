@@ -87,7 +87,7 @@ export default function UserForm({ user, t, i18n }: { user: UserPublic; t: any; 
             type="email"
             {...details_form.getInputProps('email')}
           />
-          <Button fullWidth style={{ marginTop: 20 }} color="green" type="submit">
+          <Button fullWidth style={{ marginTop: 20 }} type="submit">
             {t('save_button')}
           </Button>
           <Button
@@ -109,7 +109,7 @@ export default function UserForm({ user, t, i18n }: { user: UserPublic; t: any; 
           })}
         >
           <PasswordStrength form={password_form} />
-          <Button fullWidth style={{ marginTop: 20 }} color="green" type="submit">
+          <Button fullWidth style={{ marginTop: 20 }} type="submit">
             {t('save_button')}
           </Button>
         </form>

@@ -152,9 +152,11 @@ export function RoundsGridCols({
                   offLabel={<IoOptions size={16} />}
                   checked={displaySettings.showManualSchedulingOptions === 'false'}
                   label={
-                    displaySettings.showManualSchedulingOptions === 'true' ? 'Manual' : 'Automatic'
+                    displaySettings.showManualSchedulingOptions === 'true'
+                      ? t('manual_label')
+                      : t('automatic_label')
                   }
-                  color="indigo"
+                  color="burgundy"
                   onChange={(event) => {
                     displaySettings.setShowManualSchedulingOptions(
                       event.currentTarget.checked ? 'false' : 'true',
@@ -203,7 +205,7 @@ function NoRoundsAlert({ readOnly }: { readOnly: boolean }) {
       <Alert
         icon={<IconAlertCircle size={16} />}
         title={t('no_round_found_title')}
-        color="blue"
+        color="brand"
         radius="lg"
       >
         {t('no_round_found_description')}
@@ -215,7 +217,7 @@ function NoRoundsAlert({ readOnly }: { readOnly: boolean }) {
       <Alert
         icon={<IconAlertCircle size={16} />}
         title={t('no_round_found_title')}
-        color="blue"
+        color="brand"
         radius="lg"
       >
         {t('no_round_found_in_stage_description')}

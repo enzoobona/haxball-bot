@@ -70,7 +70,7 @@ export default function UpcomingMatchesTable({
       >
         <Table.Td>
           {upcoming_match.is_recommended ? (
-            <Badge leftSection={<IconCheck size={18} />} color="blue">
+            <Badge leftSection={<IconCheck size={18} />} color="brand">
               {t('recommended_badge_title')}
             </Badge>
           ) : null}

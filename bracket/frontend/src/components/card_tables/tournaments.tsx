@@ -1,4 +1,5 @@
 import { Badge, Button, Card, Group, Image, Text, UnstyledButton } from '@mantine/core';
+import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { SWRResponse } from 'swr';
 
@@ -15,9 +16,11 @@ export function TournamentLogo({ tournament }: { tournament: Tournament }) {
   return (
     <Image
       radius="md"
-      alt="Logo of the tournament"
+      alt={i18n.t('logo_alt_tournament')}
       src={`${getBaseApiUrl()}/static/tournament-logos/${tournament.logo_path}`}
-      fallbackSrc={`https://placehold.co/318x160?text=${tournament.name}`}
+      fallbackSrc={`data:image/svg+xml;utf8,${encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="318" height="160"><rect width="100%" height="100%" fill="#4a1025"/></svg>',
+      )}`}
       height={160}
     />
   );
@@ -81,7 +84,7 @@ export default function TournamentsCardTable({
               <Group w="100%">
                 <Badge
                   fullWidth
-                  color="yellow"
+                  color="gray"
                   variant="outline"
                   size="lg"
                   style={{ visibility: tournament.status === 'ARCHIVED' ? 'visible' : 'hidden' }}
@@ -90,12 +93,12 @@ export default function TournamentsCardTable({
                 </Badge>
                 <Button
                   component={PreloadLink}
-                  color="blue"
+                  color="brand"
                   fullWidth
                   radius="md"
                   href={`/tournaments/${tournament.id}/stages`}
                 >
-                  OPEN
+                  {t('open_button')}
                 </Button>
               </Group>
             </Card.Section>

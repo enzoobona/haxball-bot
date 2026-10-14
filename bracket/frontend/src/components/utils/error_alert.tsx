@@ -9,7 +9,8 @@ export function ErrorAlert({ title, message }: { title: string; message: string 
       color="red"
       radius="lg"
       variant="outline"
-      w="40rem"
+      w="100%"
+      maw="40rem"
     >
       {message}
     </Alert>
@@ -25,7 +26,7 @@ export default function RequestErrorAlert({ error }: any) {
 
   return (
     <Center>
-      <ErrorAlert message={message} title="Error" />
+      <ErrorAlert message={message} title={status_code} />
     </Center>
   );
 }

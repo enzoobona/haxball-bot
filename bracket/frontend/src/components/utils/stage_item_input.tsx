@@ -5,6 +5,7 @@ import {
   StageItemInputOptionTentative,
   StageItemInputTentative,
 } from '@openapi';
+import i18n from 'i18next';
 import { assert_not_none } from './assert';
 
 export type StageItemInput = StageItemInputTentative | StageItemInputFinal | StageItemInputEmpty;
@@ -20,21 +21,17 @@ export interface StageItemInputChoice {
 }
 
 export function getPositionName(position: number) {
-  // TODO: handle inputs like `21` (21st)
-  return (
-    {
-      1: '1st',
-      2: '2nd',
-      3: '3rd',
-    }[position] || `${position}th`
-  );
+  return `${position}`;
 }
 
 export function formatStageItemInputTentative(
   stage_item_input: StageItemInputTentative | StageItemInputOptionTentative,
   stageItemsLookup: any,
 ) {
-  return `${getPositionName(assert_not_none(stage_item_input.winner_position))} of ${stageItemsLookup[assert_not_none(stage_item_input.winner_from_stage_item_id)].name}`;
+  return i18n.t('position_of', {
+    position: getPositionName(assert_not_none(stage_item_input.winner_position)),
+    group: stageItemsLookup[assert_not_none(stage_item_input.winner_from_stage_item_id)].name,
+  });
 }
 
 export function formatStageItemInput(

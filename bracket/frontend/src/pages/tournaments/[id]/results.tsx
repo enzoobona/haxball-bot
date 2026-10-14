@@ -56,7 +56,7 @@ function ScheduleRow({
         : loseColor;
 
   return (
-    <UnstyledButton style={{ width: '48rem' }}>
+    <UnstyledButton style={{ width: '100%', maxWidth: '48rem' }}>
       <Card
         shadow="sm"
         radius="md"
@@ -71,7 +71,7 @@ function ScheduleRow({
           <Grid pt="0.75rem" pb="0.5rem">
             <Grid.Col mb="0rem" span={4}>
               <Text pl="sm" mt="sm" fw={800}>
-                Partido {data.match.id}
+                {t('match_label')} {data.match.id}
               </Text>
             </Grid.Col>
             <Grid.Col mb="0rem" span={4}>
@@ -216,7 +216,7 @@ function Schedule({
 
   return (
     <Group wrap="nowrap" align="top">
-      <div style={{ width: '48rem' }}>
+      <div style={{ width: '100%', maxWidth: '48rem' }}>
         {rows}
         {noItemsAlert}
       </div>
@@ -265,7 +265,7 @@ export default function ResultsPage() {
         round={null}
       />
       <Title>{t('results_title')}</Title>
-      <Center mt="1rem">
+      <Center mt="1rem" px="xs">
         <Schedule
           t={t}
           matchesLookup={matchesLookup}

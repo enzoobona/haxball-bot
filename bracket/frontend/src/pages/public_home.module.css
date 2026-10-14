@@ -1,0 +1,46 @@
+.hero {
+  color: var(--mantine-color-white);
+  background:
+    radial-gradient(circle at 85% 20%, rgba(217, 32, 39, 0.45), transparent 45%),
+    linear-gradient(135deg, var(--mantine-color-burgundy-9) 0%, #0f0f11 70%);
+  border-bottom: rem(1px) solid var(--mantine-color-dark-4);
+}
+
+.heroTitle {
+  font-size: clamp(2.4rem, 8vw, 4.5rem);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--mantine-color-white);
+}
+
+.heroText {
+  font-size: var(--mantine-font-size-lg);
+  color: var(--mantine-color-gray-3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease;
+
+  @mixin hover {
+    transform: translateY(-3px);
+    border-color: var(--mantine-color-brand-filled);
+  }
+}
+
+.cover {
+  display: block;
+}
+
+.coverFallback {
+  height: rem(170px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mantine-color-white);
+  background: linear-gradient(135deg, var(--mantine-color-burgundy-8), var(--mantine-color-dark-8));
+}

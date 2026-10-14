@@ -230,7 +230,7 @@ export function CreateStageItemModal({
           <Divider mt="1rem" />
           <TeamCountInput form={form} />
 
-          <Button fullWidth mt="1.5rem" color="green" type="submit">
+          <Button fullWidth mt="1.5rem" type="submit">
             {t('create_stage_item_button')}
           </Button>
         </form>

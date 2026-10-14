@@ -50,7 +50,7 @@ export default function CreateDemoAccountPage() {
           icon={<IconAlertCircle size={16} />}
           mb={16}
           title={t('demo_policy_title')}
-          color="blue"
+          color="brand"
           radius="md"
         >
           {t('demo_description')}

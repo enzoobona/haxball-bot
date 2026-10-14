@@ -14,7 +14,7 @@ export function WinDistribution({ wins, draws, losses, fontSizeInPixels }: Playe
   return (
     <>
       <Progress.Root size={fontSizeInPixels * 1.5}>
-        <Progress.Section value={empty ? 33.3 : percentageScale * wins} color="teal">
+        <Progress.Section value={empty ? 33.3 : percentageScale * wins} color="brand">
           <Progress.Label style={{ fontSize: fontSizeInPixels }}>
             {`${wins.toFixed(0)}`}
           </Progress.Label>
