@@ -1,0 +1,75 @@
+{
+  "teams": [
+    {
+      "name": "paraguay",
+      "angle": 90.0,
+      "textColor": "#000000",
+      "colors": [
+        "#FF1212",
+        "#FFFFFF",
+        "#0800FF"
+      ],
+      "flag": "🇵🇾"
+    },
+    {
+      "name": "argentina",
+      "angle": 90.0,
+      "textColor": "#FFEF08",
+      "colors": [
+        "#13C6F2",
+        "#FFFFFF",
+        "#13C6F2"
+      ],
+      "flag": "🇦🇷"
+    },
+    {
+      "name": "francia",
+      "angle": 180.0,
+      "textColor": "#FFF700",
+      "colors": [
+        "#180091"
+      ],
+      "flag": "🇫🇷"
+    },
+    {
+      "name": "brasil",
+      "angle": 180.0,
+      "textColor": "#11AE3B",
+      "colors": [
+        "#FFDC02"
+      ],
+      "flag": "🇧🇷"
+    },
+    {
+      "name": "uruguay",
+      "angle": 180.0,
+      "textColor": "#FFC905",
+      "colors": [
+        "#55B5E5"
+      ],
+      "flag": "🇺🇾"
+    },
+    {
+      "name": "peru",
+      "angle": 0.0,
+      "textColor": "#000000",
+      "colors": [
+        "#FF0D0D",
+        "#FFFFFF",
+        "#FF0000"
+      ],
+      "flag": "🇵🇪"
+    },
+    {
+      "name": "bolivia",
+      "angle": 90.0,
+      "textColor": "#FFFFFF",
+      "colors": [
+        "#FF1900",
+        "#FFD505",
+        "#00A83E"
+      ],
+      "flag": "🇧🇴"
+    }
+  ]
+}
