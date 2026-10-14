@@ -24,6 +24,7 @@ RUN rm -rf /var/cache/apk/*
 
 COPY backend /app
 WORKDIR /app
+RUN mkdir -p /app/static
 
 # -- Install dependencies:
 RUN addgroup --system bracket && \
