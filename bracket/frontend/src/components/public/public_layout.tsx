@@ -1,5 +1,5 @@
 import { ActionIcon, Anchor, Button, Container, Group } from '@mantine/core';
-import { IconBrandDiscord, IconBroadcast, IconLock } from '@tabler/icons-react';
+import { IconBrandDiscord, IconBrandKick, IconLock } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -21,32 +21,19 @@ export function PublicHeader() {
         <Brand />
         <Group gap="xs" wrap="nowrap">
           {STREAM_URL ? (
-            <>
-              <Button
-                component="a"
-                href={STREAM_URL}
-                target="_blank"
-                rel="noreferrer"
-                size="sm"
-                leftSection={<IconBroadcast size={18} />}
-                visibleFrom="sm"
-              >
-                {t('public_watch_stream')}
-              </Button>
-              <ActionIcon
-                component="a"
-                href={STREAM_URL}
-                target="_blank"
-                rel="noreferrer"
-                size={36}
-                color="brand"
-                variant="filled"
-                aria-label={t('public_watch_stream')}
-                hiddenFrom="sm"
-              >
-                <IconBroadcast size={18} />
-              </ActionIcon>
-            </>
+            <ActionIcon
+              component="a"
+              href={STREAM_URL}
+              target="_blank"
+              rel="noreferrer"
+              size={36}
+              color="green"
+              variant="filled"
+              aria-label={t('public_watch_stream')}
+              title={t('public_watch_stream')}
+            >
+              <IconBrandKick size={18} />
+            </ActionIcon>
           ) : null}
           {DISCORD_URL ? (
             <ActionIcon

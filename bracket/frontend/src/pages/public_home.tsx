@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Container,
+  Flex,
   Group,
   Image,
   SimpleGrid,
@@ -14,7 +15,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { IconBrandDiscord, IconBroadcast, IconCalendar, IconTrophy } from '@tabler/icons-react';
+import { IconBrandDiscord, IconBrandKick, IconBroadcast, IconCalendar, IconTrophy } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -123,44 +124,57 @@ export default function PublicHomePage() {
   return (
     <PublicLayout>
       <section className={classes.hero}>
-        <BackgroundImage src='/banner.jpeg'>
           <Container size="lg" py={{ base: 40, sm: 72 }}>
-            
-              <Title className={classes.heroTitle}>{SITE_NAME}</Title>
-              <Text className={classes.heroText} mt="md" maw={620}>
-                {SITE_TAGLINE}
-              </Text>
-              <Group mt="xl" gap="sm">
-                {STREAM_URL ? (
-                  <Button
-                    component="a"
-                    href={STREAM_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    size="md"
-                    leftSection={<IconBroadcast size={20} />}
-                  >
-                    {t('public_watch_stream')}
-                  </Button>
-                ) : null}
-                {DISCORD_URL ? (
-                  <Button
-                    component="a"
-                    href={DISCORD_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    size="md"
-                    variant="white"
-                    color="dark"
-                    leftSection={<IconBrandDiscord size={20} />}
-                  >
-                    {t('public_join_discord')}
-                  </Button>
-                ) : null}
-              </Group>
-            
+            <Flex
+              direction={{ base: 'column-reverse', sm: 'row' }}
+              align="center"
+              justify="space-between"
+              gap="xl"
+            >
+              <Box style={{ flex: 1 }}>
+                <Title className={classes.heroTitle}>{SITE_NAME}</Title>
+                <Text className={classes.heroText} mt="md" maw={620}>
+                  {SITE_TAGLINE}
+                </Text>
+                <Group mt="xl" gap="sm">
+                  {STREAM_URL ? (
+                    <Button
+                      component="a"
+                      color="green"
+                      href={STREAM_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      size="md"
+                      leftSection={<IconBrandKick size={20} />}
+                    >
+                      {t('public_watch_stream')}
+                    </Button>
+                  ) : null}
+                  {DISCORD_URL ? (
+                    <Button
+                      component="a"
+                      href={DISCORD_URL}
+                      target="_blank"
+                      rel="noreferrer"
+                      size="md"
+                      variant="white"
+                      color="dark"
+                      leftSection={<IconBrandDiscord size={20} />}
+                    >
+                      {t('public_join_discord')}
+                    </Button>
+                  ) : null}
+                </Group>
+              </Box>
+
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                w={{ base: 140, sm: 220 }}
+                fit="contain"
+              />
+            </Flex>
           </Container>
-        </BackgroundImage>
       </section>
 
       <Container size="lg" py="xl">

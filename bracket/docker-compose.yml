@@ -20,6 +20,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_SITE_NAME: ${VITE_SITE_NAME}
+        VITE_SITE_TAGLINE: ${VITE_SITE_TAGLINE}
+        VITE_STREAM_URL: ${VITE_STREAM_URL}
+        VITE_DISCORD_URL: ${VITE_DISCORD_URL}
     networks:
       - bracket_lan
     ports:

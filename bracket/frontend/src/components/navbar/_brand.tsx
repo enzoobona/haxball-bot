@@ -8,7 +8,7 @@ export function Brand({ href = '/' }: { href?: string }) {
     <Center mr="md">
       <UnstyledButton component={PreloadLink} href={href}>
         <Group gap="xs" wrap="nowrap">
-          <Image style={{ width: '36px', height: '36px' }} src="/Emblema_de_toro_con_corona_y_balon.png" alt={SITE_NAME} />
+          <Image style={{ width: '36px', height: '36px' }} src="/logo.svg" alt={SITE_NAME} />
           <Title order={3} lineClamp={1} maw={{ base: '9rem', sm: '16rem' }} fz="1.4rem">
             {SITE_NAME}
           </Title>
@@ -21,7 +21,7 @@ export function Brand({ href = '/' }: { href?: string }) {
 export function BrandFooter() {
   return (
     <Center>
-      <Image style={{ width: '28px', height: '28px' }} src="/Emblema_de_toro_con_corona_y_balon.png" alt={SITE_NAME} />
+      <Image style={{ width: '28px', height: '28px' }} src="/logo.svg" alt={SITE_NAME} />
       <Text fw={700} ml="sm">
         {SITE_NAME}
       </Text>
