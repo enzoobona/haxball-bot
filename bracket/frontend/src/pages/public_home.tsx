@@ -123,42 +123,44 @@ export default function PublicHomePage() {
   return (
     <PublicLayout>
       <section className={classes.hero}>
-        <Container size="lg" py={{ base: 40, sm: 72 }}>
-          <BackgroundImage src='/banner.jpeg'>
-            <Title className={classes.heroTitle}>{SITE_NAME}</Title>
-            <Text className={classes.heroText} mt="md" maw={620}>
-              {SITE_TAGLINE}
-            </Text>
-            <Group mt="xl" gap="sm">
-              {STREAM_URL ? (
-                <Button
-                  component="a"
-                  href={STREAM_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  size="md"
-                  leftSection={<IconBroadcast size={20} />}
-                >
-                  {t('public_watch_stream')}
-                </Button>
-              ) : null}
-              {DISCORD_URL ? (
-                <Button
-                  component="a"
-                  href={DISCORD_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  size="md"
-                  variant="white"
-                  color="dark"
-                  leftSection={<IconBrandDiscord size={20} />}
-                >
-                  {t('public_join_discord')}
-                </Button>
-              ) : null}
-            </Group>
-          </BackgroundImage>
-        </Container>
+        <BackgroundImage src='/banner.jpeg'>
+          <Container size="lg" py={{ base: 40, sm: 72 }}>
+            
+              <Title className={classes.heroTitle}>{SITE_NAME}</Title>
+              <Text className={classes.heroText} mt="md" maw={620}>
+                {SITE_TAGLINE}
+              </Text>
+              <Group mt="xl" gap="sm">
+                {STREAM_URL ? (
+                  <Button
+                    component="a"
+                    href={STREAM_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    size="md"
+                    leftSection={<IconBroadcast size={20} />}
+                  >
+                    {t('public_watch_stream')}
+                  </Button>
+                ) : null}
+                {DISCORD_URL ? (
+                  <Button
+                    component="a"
+                    href={DISCORD_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    size="md"
+                    variant="white"
+                    color="dark"
+                    leftSection={<IconBrandDiscord size={20} />}
+                  >
+                    {t('public_join_discord')}
+                  </Button>
+                ) : null}
+              </Group>
+            
+          </Container>
+        </BackgroundImage>
       </section>
 
       <Container size="lg" py="xl">
