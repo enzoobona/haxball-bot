@@ -1,0 +1,33 @@
+/* Número de posición: tamaño fijo para que ningún dígito quede recortado. */
+.position {
+  box-sizing: border-box;
+  min-width: rem(36px);
+  height: rem(32px);
+  padding: 0 rem(8px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--mantine-font-size-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  border-radius: var(--mantine-radius-md);
+  color: light-dark(var(--mantine-color-gray-8), var(--mantine-color-gray-3));
+  background: light-dark(var(--mantine-color-gray-1), var(--mantine-color-dark-5));
+
+  &[data-position='1'] {
+    color: var(--mantine-color-white);
+    background: var(--mantine-color-brand-filled);
+  }
+
+  &[data-position='2'] {
+    color: light-dark(var(--mantine-color-brand-8), var(--mantine-color-brand-2));
+    background: light-dark(var(--mantine-color-brand-1), rgba(217, 32, 39, 0.3));
+  }
+
+  &[data-position='3'] {
+    color: light-dark(var(--mantine-color-brand-9), var(--mantine-color-brand-3));
+    background: light-dark(var(--mantine-color-brand-0), rgba(217, 32, 39, 0.16));
+  }
+}

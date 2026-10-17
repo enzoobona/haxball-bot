@@ -29,3 +29,13 @@
   align-items: center;
   white-space: nowrap;
 }
+
+.discord.discord {
+  background: #5865f2;
+  color: #ffffff;
+  border-color: transparent;
+
+  @mixin hover {
+    background: #4752c4;
+  }
+}

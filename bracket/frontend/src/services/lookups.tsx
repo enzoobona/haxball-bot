@@ -98,7 +98,7 @@ export function stringToColour(input: string) {
     // eslint-disable-next-line no-bitwise
     hash = input.charCodeAt(i) + ((hash << 5) - hash);
   }
-  const colors = ['brand', 'burgundy', 'gray', 'orange', 'pink', 'grape', 'dark'];
+  const colors = ['brand', 'red', 'gray', 'orange', 'pink', 'grape', 'dark'];
   return colors[Math.abs(hash) % colors.length];
 }
 

@@ -26,6 +26,9 @@ import CourtsPresentPage from './pages/tournaments/[id]/dashboard/present/courts
 import StandingsPresentPage from './pages/tournaments/[id]/dashboard/present/standings';
 import DashboardStandingsPage from './pages/tournaments/[id]/dashboard/standings';
 import DashboardBracketPage from './pages/tournaments/[id]/dashboard/bracket';
+import DashboardPlayerPage from './pages/tournaments/[id]/dashboard/player';
+import DashboardStatsPage from './pages/tournaments/[id]/dashboard/stats';
+import DashboardTeamPage from './pages/tournaments/[id]/dashboard/team';
 import DashboardTeamsPage from './pages/tournaments/[id]/dashboard/teams';
 import PublicHomePage from './pages/public_home';
 import { tokenPresent } from '@services/local_storage';
@@ -92,7 +95,14 @@ createRoot(document.getElementById('root')!).render(
                     <Route index element={<DashboardSchedulePage />} />
                     <Route path="bracket" element={<DashboardBracketPage />} />
                     <Route path="standings" element={<DashboardStandingsPage />} />
-                    <Route path="teams" element={<DashboardTeamsPage />} />
+                    <Route path="stats">
+                      <Route index element={<DashboardStatsPage />} />
+                      <Route path="players/:player_id" element={<DashboardPlayerPage />} />
+                    </Route>
+                    <Route path="teams">
+                      <Route index element={<DashboardTeamsPage />} />
+                      <Route path=":team_id" element={<DashboardTeamPage />} />
+                    </Route>
                     <Route path="present">
                       <Route path="courts" element={<CourtsPresentPage />} />
                       <Route path="standings" element={<StandingsPresentPage />} />

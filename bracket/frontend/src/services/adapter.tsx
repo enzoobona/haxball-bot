@@ -106,7 +106,7 @@ function getTimeState() {
   return { time: dayjs() };
 }
 
-const fetcher = (url: string) =>
+export const fetcher = (url: string) =>
   createAxios()
     .get(url)
     .then((res: { data: any }) => res.data);

@@ -46,7 +46,7 @@ export default function ActivatePreviousStageModal({
 
           <Button
             fullWidth
-            color="burgundy"
+            color="brand"
             size="md"
             mt="lg"
             type="submit"
@@ -60,7 +60,7 @@ export default function ActivatePreviousStageModal({
       <Button
         size="md"
         mb="10"
-        color="burgundy"
+        color="brand"
         leftSection={<IconSquareArrowLeft size={24} />}
         onClick={async () => {
           setOpened(true);

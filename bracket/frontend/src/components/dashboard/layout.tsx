@@ -13,6 +13,7 @@ import {
   IconArrowLeft,
   IconBrackets,
   IconCalendar,
+  IconChartBar,
   IconListNumbers,
   IconUsers,
 } from '@tabler/icons-react';
@@ -87,6 +88,11 @@ export function TournamentTitle({ tournamentDataFull }: { tournamentDataFull: To
   );
 }
 
+// Las páginas de jugador/equipo (`.../stats/players/1`, `.../teams/3`) mantienen activa su pestaña.
+function isTabActive(link: string, pathName: string, base: string) {
+  return link === pathName || (link !== base && pathName.startsWith(`${link}/`));
+}
+
 export function DoubleHeader({ tournamentData }: { tournamentData: Tournament }) {
   const { t } = useTranslation();
   const location = useLocation();
@@ -99,6 +105,7 @@ export function DoubleHeader({ tournamentData }: { tournamentData: Tournament })
     { link: base, label: t('matches_title'), icon: IconCalendar },
     { link: `${base}/bracket`, label: t('bracket_title'), icon: IconBrackets },
     { link: `${base}/standings`, label: t('standings_title'), icon: IconListNumbers },
+    { link: `${base}/stats`, label: t('stats_title'), icon: IconChartBar },
     { link: `${base}/teams`, label: t('public_teams_title'), icon: IconUsers },
   ];
 
@@ -143,7 +150,7 @@ export function DoubleHeader({ tournamentData }: { tournamentData: Tournament })
               href={tab.link}
               key={tab.link}
               className={classes.tab}
-              data-active={tab.link === pathName || undefined}
+              data-active={isTabActive(tab.link, pathName, base) || undefined}
             >
               <tab.icon size={18} stroke={1.8} />
               <span>{tab.label}</span>

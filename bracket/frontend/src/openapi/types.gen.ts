@@ -426,6 +426,10 @@ export type MatchHaxball = {
    */
   id: number;
   /**
+   * Number
+   */
+  number: number;
+  /**
    * Team 1 Name
    */
   team_1_name: string;
@@ -585,6 +589,12 @@ export type MatchWithDetails = {
    */
   stage_item_input2?: StageItemInputTentative | StageItemInputFinal | StageItemInputEmpty | null;
   court?: Court | null;
+  /**
+   * Number
+   *
+   * Número del partido dentro del torneo (el que se usa en la sala de Haxball).
+   */
+  number?: number | null;
 };
 
 /**
@@ -676,6 +686,12 @@ export type MatchWithDetailsDefinitive = {
    */
   stage_item_input2: StageItemInputTentative | StageItemInputFinal | StageItemInputEmpty;
   court?: Court | null;
+  /**
+   * Number
+   *
+   * Número del partido dentro del torneo (el que se usa en la sala de Haxball).
+   */
+  number?: number | null;
 };
 
 /**

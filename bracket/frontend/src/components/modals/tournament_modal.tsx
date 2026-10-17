@@ -121,7 +121,7 @@ function GeneralTournamentForm({
         <Grid.Col span={{ sm: 3 }}>
           <Button
             fullWidth
-            color="burgundy"
+            color="brand"
             leftSection={<IconCalendarTime size="1.1rem" stroke={1.5} />}
             onClick={() => {
               form.setFieldValue('start_time', dayjs());

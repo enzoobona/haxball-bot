@@ -1,6 +1,6 @@
 import { createTheme } from '@mantine/core';
 
-// Paleta: rojo (acción / marca), bordo (acento profundo), negro y grises (base), blanco (texto).
+// Paleta: tonalidades de rojo (acción / marca), negro y grises (base), blanco (texto).
 const red = [
   '#fff0f0',
   '#ffdcdc',
@@ -12,19 +12,6 @@ const red = [
   '#b8161e',
   '#98121a',
   '#780e15',
-] as const;
-
-const burgundy = [
-  '#fbeff2',
-  '#f2d7de',
-  '#e3aab9',
-  '#d27c93',
-  '#c1556f',
-  '#a63a58',
-  '#8a2646',
-  '#731d3a',
-  '#5e1630',
-  '#4a1025',
 ] as const;
 
 // Reemplaza la escala `dark` de Mantine por negros / grises neutros.
@@ -46,7 +33,6 @@ export const theme = createTheme({
   primaryShade: { light: 6, dark: 6 },
   colors: {
     brand: red,
-    burgundy,
     dark,
   },
   defaultRadius: 'md',

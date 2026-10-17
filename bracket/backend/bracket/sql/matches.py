@@ -443,6 +443,15 @@ async def sql_get_match_haxball(
     query = """
         SELECT
             m.id,
+            (
+                SELECT COUNT(*)
+                FROM matches AS m2
+                JOIN rounds AS r2 ON r2.id = m2.round_id
+                JOIN stage_items AS si2 ON si2.id = r2.stage_item_id
+                JOIN stages AS s2 ON s2.id = si2.stage_id
+                WHERE s2.tournament_id = :tournament_id
+                  AND m2.id <= m.id
+            ) AS number,
             t1.id AS team_1_id,
             t1.name AS team_1_name,
             t2.id AS team_2_id,
@@ -480,6 +489,32 @@ async def sql_get_match_haxball(
         return None
 
     return MatchHaxball.model_validate(dict(result._mapping))
+
+async def sql_get_match_haxball_by_number(
+    tournament_id: TournamentId,
+    number: int,
+) -> MatchHaxball | None:
+    """Busca un partido por su número dentro del torneo (el que se usa en la sala de Haxball)."""
+    match_id = await database.fetch_val(
+        query="""
+            SELECT numbered.id
+            FROM (
+                SELECT m.id, ROW_NUMBER() OVER (ORDER BY m.id) AS number
+                FROM matches AS m
+                JOIN rounds AS r ON r.id = m.round_id
+                JOIN stage_items AS si ON si.id = r.stage_item_id
+                JOIN stages AS s ON s.id = si.stage_id
+                WHERE s.tournament_id = :tournament_id
+            ) AS numbered
+            WHERE numbered.number = :number
+        """,
+        values={"tournament_id": tournament_id, "number": number},
+    )
+    if match_id is None:
+        return None
+
+    return await sql_get_match_haxball(tournament_id, MatchId(match_id))
+
 
 async def sql_count_players_in_tournament(
     player_ids: list[PlayerId],

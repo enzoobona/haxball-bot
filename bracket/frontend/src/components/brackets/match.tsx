@@ -1,4 +1,4 @@
-import { Center, Grid, UnstyledButton, useMantineTheme } from '@mantine/core';
+import { Grid, UnstyledButton, useMantineTheme } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SWRResponse } from 'swr';
@@ -6,33 +6,36 @@ import { SWRResponse } from 'swr';
 import MatchModal from '@components/modals/match_modal';
 import { assert_not_none } from '@components/utils/assert';
 import { Time } from '@components/utils/datetime';
+import { TeamLink } from '@components/public/entity_links';
 import { formatMatchInput1, formatMatchInput2, isMatchHappening } from '@components/utils/match';
 import { TournamentMinimal } from '@components/utils/tournament';
 import { MatchWithDetails, RoundWithMatches, StagesWithStageItemsResponse } from '@openapi';
 import { getMatchLookup, getStageItemLookup } from '@services/lookups';
 import classes from './match.module.css';
 
-export function MatchBadge({ match, theme }: { match: MatchWithDetails; theme: any }) {
-  const visibility = match.court ? 'visible' : 'hidden';
-  const badgeColor = theme.colors.burgundy[7];
+export function MatchBadge({ match }: { match: MatchWithDetails }) {
+  const hasInfo = match.court != null || match.number != null;
   return (
-    <Center style={{ transform: 'translateY(0%)', visibility }}>
-      <div
-        style={{
-          width: '75%',
-          backgroundColor: isMatchHappening(match) ? theme.colors.brand[7] : badgeColor,
-          borderRadius: '8px 8px 0px 0px',
-          padding: '4px 12px 4px 12px',
-        }}
-      >
-        <Center>
-          <b>
-            {match.court?.name} |{' '}
-            {match.start_time != null ? <Time datetime={match.start_time} /> : null}
-          </b>
-        </Center>
-      </div>
-    </Center>
+    <div
+      className={classes.badge}
+      data-live={isMatchHappening(match) || undefined}
+      style={{ visibility: hasInfo ? 'visible' : 'hidden' }}
+    >
+      {match.number != null ? <span>#{match.number}</span> : null}
+      {match.court != null ? (
+        <span className={classes.badgeCourt} title={match.court.name}>
+          {match.court.name}
+        </span>
+      ) : null}
+      {match.start_time != null && match.court != null ? (
+        <>
+          <span aria-hidden>|</span>
+          <span className={classes.badgeTime}>
+            <Time datetime={match.start_time} />
+          </span>
+        </>
+      ) : null}
+    </div>
   );
 }
 
@@ -67,14 +70,25 @@ export default function Match({
   const team2_style =
     match.stage_item_input1_score < match.stage_item_input2_score ? winner_style : {};
 
-  const team1_label = formatMatchInput1(t, stageItemsLookup, matchesLookup, match);
-  const team2_label = formatMatchInput2(t, stageItemsLookup, matchesLookup, match);
+  const team1_name = formatMatchInput1(t, stageItemsLookup, matchesLookup, match);
+  const team2_name = formatMatchInput2(t, stageItemsLookup, matchesLookup, match);
+  // Solo la vista pública (readOnly) lleva a la página del equipo; en el admin el partido es un botón.
+  const team1_label = readOnly ? (
+    <TeamLink teamId={match.stage_item_input1?.team_id}>{team1_name}</TeamLink>
+  ) : (
+    team1_name
+  );
+  const team2_label = readOnly ? (
+    <TeamLink teamId={match.stage_item_input2?.team_id}>{team2_name}</TeamLink>
+  ) : (
+    team2_name
+  );
 
   const [opened, setOpened] = useState(false);
 
   const bracket = (
     <>
-      <MatchBadge match={match} theme={theme} />
+      <MatchBadge match={match} />
       <div className={classes.top} style={team1_style}>
         <Grid grow>
           <Grid.Col span={10}>{team1_label}</Grid.Col>

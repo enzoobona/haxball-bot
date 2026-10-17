@@ -2,6 +2,8 @@ import { ActionIcon, Box, useComputedColorScheme, useMantineColorScheme } from '
 import { IconMoonStars, IconSun } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
+import classes from './color_scheme_toggle.module.css';
+
 export function ColorSchemeToggle({ size = 36 }: { size?: number }) {
   const { t } = useTranslation();
   const { setColorScheme } = useMantineColorScheme();
@@ -16,10 +18,11 @@ export function ColorSchemeToggle({ size = 36 }: { size?: number }) {
       title={label}
       onClick={() => setColorScheme(computed === 'light' ? 'dark' : 'light')}
     >
-      <Box lightHidden component="span" display="flex">
+      {/* Sin `display` inline: pisaba lightHidden/darkHidden y se veían los dos íconos. */}
+      <Box lightHidden component="span" className={classes.icon}>
         <IconSun size={18} />
       </Box>
-      <Box darkHidden component="span" display="flex">
+      <Box darkHidden component="span" className={classes.icon}>
         <IconMoonStars size={18} />
       </Box>
     </ActionIcon>

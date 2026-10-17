@@ -7,7 +7,6 @@ import { DashboardShell, getTournamentHeadTitle } from '@components/dashboard/la
 import { NoContent } from '@components/no_content/empty_table_info';
 import MatchCard from '@components/public/match_card';
 import { compareDateTime, formatDayLabel } from '@components/utils/datetime';
-import { isMatchHappening, isMatchInTheFuture } from '@components/utils/match';
 import { TableSkeletonTwoColumns } from '@components/utils/skeletons';
 import { Translator } from '@components/utils/types';
 import { responseIsValid, setTitle } from '@components/utils/util';
@@ -38,11 +37,11 @@ export function Schedule({
     );
   const unscheduled = all.filter((m) => m.match.start_time == null);
 
+  // "Jugado" lo define el resultado cargado (`played`), no el horario: un partido puede jugarse
+  // antes o después de su horario, o no tener horario.
   const matchesFilter = (m: any) => {
     if (filter === 'all') return true;
-    if (m.match.start_time == null) return filter === 'upcoming';
-    const ongoingOrFuture = isMatchHappening(m.match) || isMatchInTheFuture(m.match);
-    return filter === 'upcoming' ? ongoingOrFuture : !ongoingOrFuture;
+    return filter === 'played' ? m.match.played : !m.match.played;
   };
 
   const visibleScheduled = scheduled.filter(matchesFilter);

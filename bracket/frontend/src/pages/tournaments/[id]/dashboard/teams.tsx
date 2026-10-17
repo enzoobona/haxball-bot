@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DashboardShell, getTournamentHeadTitle } from '@components/dashboard/layout';
+import { PlayerLink, TeamLink } from '@components/public/entity_links';
 import { NoContent } from '@components/no_content/empty_table_info';
 import { TableSkeletonTwoColumns } from '@components/utils/skeletons';
 import { responseIsValid, setTitle } from '@components/utils/util';
@@ -37,7 +38,7 @@ function ShirtDots({ team }: { team: FullTeamWithPlayers }) {
 
 function TeamCard({ team }: { team: FullTeamWithPlayers }) {
   const { t } = useTranslation();
-  const players = [...team.players].map((p) => p.name).sort((a, b) => a.localeCompare(b));
+  const players = [...team.players].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <Card withBorder radius="lg" padding="md">
@@ -53,8 +54,10 @@ function TeamCard({ team }: { team: FullTeamWithPlayers }) {
         </Avatar>
         <div style={{ minWidth: 0, flex: 1 }}>
           <Text fw={800} size="lg" lineClamp={1} title={team.name}>
-            {team.emoji ? `${team.emoji} ` : ''}
-            {team.name}
+            <TeamLink teamId={team.id}>
+              {team.emoji ? `${team.emoji} ` : ''}
+              {team.name}
+            </TeamLink>
           </Text>
           <Group gap="xs" mt={2}>
             <ShirtDots team={team} />
@@ -66,7 +69,14 @@ function TeamCard({ team }: { team: FullTeamWithPlayers }) {
       </Group>
 
       <Text size="sm" c="dimmed" mt="sm">
-        {players.length > 0 ? players.join(', ') : t('public_team_no_players')}
+        {players.length > 0
+          ? players.map((player, index) => (
+              <React.Fragment key={player.id}>
+                {index > 0 ? ', ' : null}
+                <PlayerLink playerId={player.id}>{player.name}</PlayerLink>
+              </React.Fragment>
+            ))
+          : t('public_team_no_players')}
       </Text>
     </Card>
   );

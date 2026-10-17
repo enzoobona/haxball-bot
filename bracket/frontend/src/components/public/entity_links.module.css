@@ -1,0 +1,9 @@
+.link {
+  color: inherit;
+  text-decoration: none;
+
+  @mixin hover {
+    color: var(--mantine-color-brand-filled);
+    text-decoration: underline;
+  }
+}

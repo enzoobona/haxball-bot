@@ -10,11 +10,11 @@ from starlette.exceptions import HTTPException
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse, Response
-from starlette.staticfiles import StaticFiles
 
 from bracket.config import Environment, config, environment, init_sentry
 from bracket.cronjobs.scheduling import start_cronjobs
 from bracket.database import database
+from bracket.logic.uploaded_files import StaticFilesWithDatabaseFallback
 from bracket.models.metrics import RequestDefinition, get_request_metrics
 from bracket.routes import (
     auth,
@@ -28,6 +28,7 @@ from bracket.routes import (
     stage_item_inputs,
     stage_items,
     stages,
+    stats,
     teams,
     tournaments,
     users,
@@ -74,6 +75,7 @@ routers = {
     "Stage Items": stage_items.router,
     "Stage Item Inputs": stage_item_inputs.router,
     "Stages": stages.router,
+    "Stats": stats.router,
     "Teams": teams.router,
     "Tournaments": tournaments.router,
     "Users": users.router,
@@ -152,7 +154,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     return JSONResponse({"detail": "Internal server error"}, status_code=500)
 
 
-app.mount(f"{config.api_prefix}/static", StaticFiles(directory="static"), name="static")
+app.mount(f"{config.api_prefix}/static", StaticFilesWithDatabaseFallback(directory="static"), name="static")
 
 for tag, router in routers.items():
     assert router.prefix == config.api_prefix, f"Prefix not set on router with tag `{tag}`"

@@ -1,0 +1,4 @@
+/* Sin `display` propio: Mantine oculta el ícono que no corresponde con display: none. */
+.icon {
+  line-height: 0;
+}

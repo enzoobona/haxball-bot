@@ -1,7 +1,8 @@
-import { Avatar, Badge, Center, Group, Paper, Table, Text, Tooltip } from '@mantine/core';
+import { Avatar, Center, Group, Paper, Table, Text, Tooltip } from '@mantine/core';
 
 import { useTranslation } from 'react-i18next';
 
+import { TeamLink } from '@components/public/entity_links';
 import { EmptyTableInfo } from '@components/no_content/empty_table_info';
 import { formatStageItemInput } from '@components/utils/stage_item_input';
 import { getBaseApiUrl } from '@services/adapter';
@@ -11,20 +12,7 @@ import { StageItemInputFinal, StageItemWithRounds } from '@openapi';
 import { ThNotSortable, ThSortable, getTableState, sortTableEntries } from './table';
 
 import TableLayoutLarge from './table_large';
-
-function getPositionVariant(position: number) {
-  if (position === 1) return 'filled';
-  if (position === 2) return 'light';
-  if (position === 3) return 'light';
-  return 'light';
-}
-
-function getPositionColor(position: number) {
-  if (position === 1) return 'brand';
-  if (position === 2) return 'gray';
-  if (position === 3) return 'burgundy';
-  return undefined;
-}
+import classes from './standings.module.css';
 
 export function StandingsTableForStageItem({
   teams_with_inputs,
@@ -76,18 +64,14 @@ export function StandingsTableForStageItem({
       <Table.Tr key={team_with_input.id}>
         <Table.Td style={{ width: '4rem' }}>
           <Center>
-            <Badge
-              variant={getPositionVariant(index + 1)}
-              color={getPositionColor(index + 1)}
-              size="lg"
-              radius="md"
-            >
+            <div className={classes.position} data-position={index + 1 <= 3 ? index + 1 : undefined}>
               {index + 1}
-            </Badge>
+            </div>
           </Center>
         </Table.Td>
 
-        <Table.Td>
+        {/* width 100% + maxWidth 0: la columna del nombre se achica (con "…") y deja ver los puntos. */}
+        <Table.Td style={{ width: '100%', maxWidth: 0 }}>
           <Group gap="sm" wrap="nowrap">
             <Avatar
               src={team.logo_path ? `${getBaseApiUrl()}/static/team-logos/${team.logo_path}` : null}
@@ -99,8 +83,8 @@ export function StandingsTableForStageItem({
             </Avatar>
 
             <Tooltip label={teamName ?? team.name}>
-              <Text fw={600} truncate lineClamp={1}>
-                {teamName ?? team.name}
+              <Text fw={600} truncate="end" style={{ minWidth: 0 }}>
+                <TeamLink teamId={team.id}>{teamName ?? team.name}</TeamLink>
               </Text>
             </Tooltip>
           </Group>

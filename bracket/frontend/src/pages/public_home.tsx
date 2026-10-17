@@ -157,8 +157,7 @@ export default function PublicHomePage() {
                       target="_blank"
                       rel="noreferrer"
                       size="md"
-                      variant="white"
-                      color="dark"
+                      className={classes.discord}
                       leftSection={<IconBrandDiscord size={20} />}
                     >
                       {t('public_join_discord')}

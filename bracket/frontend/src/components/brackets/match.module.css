@@ -20,3 +20,35 @@
   padding: 8px 8px 8px 15px;
   border-radius: 0px 0px 8px 8px;
 }
+
+/* Chapita con cancha y horario: centrada y con salto de línea si el nombre es largo. */
+.badge {
+  width: 85%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 4px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 0.4rem;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--mantine-color-white);
+  background-color: var(--mantine-color-brand-9);
+  border-radius: 8px 8px 0 0;
+
+  &[data-live] {
+    background-color: var(--mantine-color-brand-7);
+  }
+}
+
+.badgeCourt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.badgeTime {
+  white-space: nowrap;
+}

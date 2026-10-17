@@ -50,6 +50,7 @@ from bracket.sql.matches import (
     sql_finish_match,
     sql_get_match_for_update,
     sql_get_match_haxball,
+    sql_get_match_haxball_by_number,
     sql_get_match_player_stats_detail,
     sql_reset_match,
     sql_update_match,
@@ -94,6 +95,24 @@ async def get_matches_to_schedule(
     return UpcomingMatchesResponse(
         data=get_upcoming_matches_for_swiss(match_filter, stage_item, draft_round)
     )
+
+@router.get(
+    "/tournaments/{tournament_id}/matches/number/{number}",
+    response_model=MatchHaxballResponse,
+)
+async def get_match_haxball_by_number(
+    tournament_id: TournamentId,
+    number: int,
+    _: UserPublic = Depends(user_authenticated_for_tournament),
+) -> MatchHaxballResponse:
+    """Partido según su número dentro del torneo (1, 2, 3...), no su id global."""
+    match = await sql_get_match_haxball_by_number(tournament_id, number)
+
+    if match is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Match not found")
+
+    return MatchHaxballResponse(data=match)
+
 
 @router.get(
     "/tournaments/{tournament_id}/matches/{match_id}",

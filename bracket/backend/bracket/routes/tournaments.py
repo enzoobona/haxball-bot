@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from starlette import status
 
 from bracket.config import config
+from bracket.logic.uploaded_files import remove_uploaded_file, save_uploaded_file
 from bracket.database import database
 from bracket.logic.planning.matches import update_start_times_of_matches
 from bracket.logic.subscriptions import check_requirement
@@ -207,15 +208,10 @@ async def upload_logo(
         new_logo_path = f"static/tournament-logos/{filename}" if file is not None else None
 
         if new_logo_path:
-            await aiofiles.os.makedirs("static/tournament-logos", exist_ok=True)
-            async with aiofiles.open(new_logo_path, "wb") as f:
-                await f.write(await file.read())
+            await save_uploaded_file(new_logo_path, await file.read())
 
     if old_logo_path is not None and old_logo_path != new_logo_path:
-        try:
-            await aiofiles.os.remove(old_logo_path)
-        except Exception as exc:
-            logger.error(f"Could not remove logo that should still exist: {old_logo_path}\n{exc}")
+        await remove_uploaded_file(old_logo_path)
 
     await database.execute(
         tournaments.update().where(tournaments.c.id == tournament_id),

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, UploadFile
 from heliclockter import datetime_utc
 
 from bracket.config import config
+from bracket.logic.uploaded_files import remove_uploaded_file, save_uploaded_file
 from bracket.database import database
 from bracket.logic.subscriptions import check_requirement
 from bracket.logic.teams import get_team_logo_path
@@ -159,15 +160,10 @@ async def update_team_logo(
         new_logo_path = f"static/team-logos/{filename}" if file is not None else None
 
         if new_logo_path:
-            await aiofiles.os.makedirs("static/team-logos", exist_ok=True)
-            async with aiofiles.open(new_logo_path, "wb") as f:
-                await f.write(await file.read())
+            await save_uploaded_file(new_logo_path, await file.read())
 
     if old_logo_path is not None and old_logo_path != new_logo_path:
-        try:
-            await aiofiles.os.remove(old_logo_path)
-        except Exception as exc:
-            logger.error(f"Could not remove logo that should still exist: {old_logo_path}\n{exc}")
+        await remove_uploaded_file(old_logo_path)
 
     await database.execute(
         teams.update().where(teams.c.id == team.id),

@@ -20,7 +20,7 @@ export function PlayerScore({
 
   return (
     <Progress.Root size={fontSizeInPixels * 1.5}>
-      <Progress.Section value={empty ? 50 : percentageScale * (score - min_score)} color="burgundy">
+      <Progress.Section value={empty ? 50 : percentageScale * (score - min_score)} color="brand">
         <Progress.Label style={{ fontSize: fontSizeInPixels }}>
           {Number(score).toFixed(decimals)}
         </Progress.Label>

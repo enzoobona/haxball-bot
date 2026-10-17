@@ -1,0 +1,40 @@
+.statCard {
+  padding: var(--mantine-spacing-md);
+  text-align: center;
+}
+
+.statValue {
+  font-size: rem(32px);
+  font-weight: 900;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+
+  &[data-active] {
+    color: var(--mantine-color-brand-filled);
+  }
+}
+
+.matchItem {
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+}
+
+.matchScore {
+  flex-shrink: 0;
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--mantine-color-dimmed);
+
+  &[data-played] {
+    color: inherit;
+  }
+}

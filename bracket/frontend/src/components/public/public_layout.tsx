@@ -42,7 +42,8 @@ export function PublicHeader() {
               target="_blank"
               rel="noreferrer"
               size={36}
-              variant="default"
+              variant="filled"
+              className={classes.discord}
               aria-label={t('public_join_discord')}
               title={t('public_join_discord')}
             >

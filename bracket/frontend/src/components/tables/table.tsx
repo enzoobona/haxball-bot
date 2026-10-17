@@ -77,7 +77,7 @@ export function ThSortable({ children, field, visibleFrom, state }: ThProps) {
   return (
     <Table.Th className={classes.th} visibleFrom={visibleFrom}>
       <UnstyledButton onClick={onSort} className={classes.control} style={{ fontSize: 'inherit' }}>
-        <Group justify="apart">
+        <Group justify="apart" wrap="nowrap" gap={4}>
           <Text fw={800} inherit ml="0.5rem" my="0.25rem">
             {children}
           </Text>

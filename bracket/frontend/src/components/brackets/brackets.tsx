@@ -156,7 +156,7 @@ export function RoundsGridCols({
                       ? t('manual_label')
                       : t('automatic_label')
                   }
-                  color="burgundy"
+                  color="brand"
                   onChange={(event) => {
                     displaySettings.setShowManualSchedulingOptions(
                       event.currentTarget.checked ? 'false' : 'true',

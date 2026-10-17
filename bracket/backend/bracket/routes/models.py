@@ -6,6 +6,7 @@ from bracket.models.db.court import Court
 from bracket.models.db.match import Match, MatchHaxball, MatchPlayerStatsDetail, SuggestedMatch
 from bracket.models.db.player import Player
 from bracket.models.db.ranking import Ranking
+from bracket.models.db.stats import PlayerProfile, PlayerStatsRow, TeamProfile
 from bracket.models.db.stage_item_inputs import (
     StageItemInputOptionFinal,
     StageItemInputOptionTentative,
@@ -113,4 +114,16 @@ class StageItemInputOptionsResponse(
 
 
 class StageRankingResponse(DataResponse[dict[StageItemId, list[StageItemInputUpdate]]]):
+    pass
+
+
+class PlayersStatsResponse(DataResponse[list[PlayerStatsRow]]):
+    pass
+
+
+class PlayerProfileResponse(DataResponse[PlayerProfile]):
+    pass
+
+
+class TeamProfileResponse(DataResponse[TeamProfile]):
     pass

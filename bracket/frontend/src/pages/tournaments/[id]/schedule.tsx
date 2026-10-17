@@ -296,7 +296,7 @@ export default function SchedulePage() {
           {data.length < 1 ? null : (
             <Group justify="right">
               <Button
-                color="burgundy"
+                color="brand"
                 size="md"
                 variant="filled"
                 style={{ marginBottom: 10 }}

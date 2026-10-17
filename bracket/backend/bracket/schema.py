@@ -1,4 +1,13 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, UniqueConstraint, func
+from sqlalchemy import (
+    Column,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Table,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from sqlalchemy.sql.sqltypes import BigInteger, Boolean, DateTime, Enum, Float, Text
 
@@ -318,4 +327,15 @@ match_player_stats = Table(
     ),
 
     UniqueConstraint("match_id", "player_id"),
+)
+
+# Copia en la base de datos de los logos subidos (ver `bracket/logic/uploaded_files.py`).
+# En hostings con disco efímero (p. ej. el plan gratuito de Render) la carpeta `static/` se
+# vacía en cada reinicio; con esta tabla el archivo se restaura solo al pedirlo.
+uploaded_files = Table(
+    "uploaded_files",
+    metadata,
+    Column("path", String, primary_key=True),
+    Column("data", LargeBinary, nullable=False),
+    Column("created", DateTimeTZ, nullable=False, server_default=func.now()),
 )

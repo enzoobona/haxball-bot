@@ -35,7 +35,7 @@ export default function CourtsLarge({
   return (
     <Grid align="center" style={{ marginTop: '1rem' }} gutter="2rem">
       <Grid.Col span={{ sm: 2 }}>
-        <CourtBadge name={court.name} color="burgundy" />
+        <CourtBadge name={court.name} color="brand" />
       </Grid.Col>
       <Grid.Col span={{ sm: 5 }}>
         <Grid>

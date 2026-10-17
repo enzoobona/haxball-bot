@@ -68,6 +68,9 @@ class MatchWithDetails(Match):
     """
 
     court: Court | None = None
+    # Número del partido DENTRO del torneo (1, 2, 3...), por orden de creación. Es el que se
+    # usa en la sala de Haxball (`!partido N`). No es el id global de la base de datos.
+    number: int | None = None
 
 
 def get_match_hash(
@@ -81,6 +84,7 @@ class MatchWithDetailsDefinitive(Match):
     stage_item_input1: StageItemInput
     stage_item_input2: StageItemInput
     court: Court | None = None
+    number: int | None = None
 
     @property
     def stage_item_inputs(self) -> list[StageItemInput]:
@@ -155,6 +159,8 @@ class SuggestedMatch(BaseModel):
 
 class MatchHaxball(BaseModel):
     id: MatchId
+    # Número del partido dentro del torneo (ver `MatchWithDetails.number`).
+    number: int
     team_1_id: TeamId
     team_1_name: str
     team_2_id: TeamId

@@ -28,7 +28,7 @@ function RankingDeleteButton({
   if (ranking.position === 0) {
     return (
       <Center ml="1rem" miw="10rem">
-        <Badge color="burgundy">{t('default_ranking_badge')}</Badge>
+        <Badge color="brand">{t('default_ranking_badge')}</Badge>
       </Center>
     );
   }
