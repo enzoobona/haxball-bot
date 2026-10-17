@@ -1,5 +1,6 @@
 import { Group, Text } from '@mantine/core';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
+import { showNotification } from '@mantine/notifications';
 import { IconCloudUpload, IconDownload, IconX } from '@tabler/icons-react';
 import { AxiosError } from 'axios';
 import { useMemo, useRef } from 'react';
@@ -44,13 +45,28 @@ export function DropzoneButton({
         mt="lg"
         openRef={openRef}
         onDrop={async (files) => {
-          const response = await useUploadLogo(files[0]);
+          try {
+            await useUploadLogo(files[0]);
+          } catch (exc: any) {
+            // Antes el error se perdía en silencio y parecía que el logo se había subido.
+            if (exc?.name === 'AxiosError') {
+              handleRequestError(exc as AxiosError);
+              return;
+            }
+            throw exc;
+          }
           await swrTeamsResponse.mutate();
-          handleRequestError(response as unknown as AxiosError); // TODO: Check with Erik if this is correct
         }}
+        onReject={() =>
+          showNotification({
+            color: 'red',
+            title: t('error_title'),
+            message: t('dropzone_reject_text'),
+          })
+        }
         // className={classes.dropzone}
         radius="md"
-        accept={[MIME_TYPES.png, MIME_TYPES.jpeg]}
+        accept={[MIME_TYPES.png, MIME_TYPES.jpeg, MIME_TYPES.webp]}
         maxSize={5 * 1024 ** 2}
       >
         <div style={{ pointerEvents: 'none' }}>

@@ -14,7 +14,7 @@ from starlette.responses import JSONResponse, Response
 from bracket.config import Environment, config, environment, init_sentry
 from bracket.cronjobs.scheduling import start_cronjobs
 from bracket.database import database
-from bracket.logic.uploaded_files import StaticFilesWithDatabaseFallback
+from bracket.logic.uploaded_files import StaticFilesWithDatabaseFallback, init_uploaded_files
 from bracket.models.metrics import RequestDefinition, get_request_metrics
 from bracket.routes import (
     auth,
@@ -48,6 +48,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
     if config.auto_run_migrations and environment is not Environment.CI:
         alembic_run_migrations()
+
+    await init_uploaded_files()
 
     if environment is Environment.PRODUCTION:
         start_cronjobs()

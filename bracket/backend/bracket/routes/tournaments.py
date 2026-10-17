@@ -7,6 +7,7 @@ from starlette import status
 from bracket.config import config
 from bracket.logic.uploaded_files import (
     get_logo_extension,
+    read_logo_content,
     remove_uploaded_file,
     save_uploaded_file,
 )
@@ -208,7 +209,7 @@ async def upload_logo(
         new_logo_path = f"static/tournament-logos/{filename}" if file is not None else None
 
         if new_logo_path:
-            await save_uploaded_file(new_logo_path, await file.read())
+            await save_uploaded_file(new_logo_path, await read_logo_content(file))
 
     if old_logo_path is not None and old_logo_path != new_logo_path:
         await remove_uploaded_file(old_logo_path)
