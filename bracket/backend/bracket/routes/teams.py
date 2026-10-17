@@ -1,14 +1,15 @@
 import csv
-import os
 from uuid import uuid4
 
-import aiofiles
-import aiofiles.os
 from fastapi import APIRouter, Depends, UploadFile
 from heliclockter import datetime_utc
 
 from bracket.config import config
-from bracket.logic.uploaded_files import remove_uploaded_file, save_uploaded_file
+from bracket.logic.uploaded_files import (
+    get_logo_extension,
+    remove_uploaded_file,
+    save_uploaded_file,
+)
 from bracket.database import database
 from bracket.logic.subscriptions import check_requirement
 from bracket.logic.teams import get_team_logo_path
@@ -152,9 +153,7 @@ async def update_team_logo(
     new_logo_path: str | None = None
 
     if file:
-        assert file.filename is not None
-        extension = os.path.splitext(file.filename)[1]
-        assert extension in (".png", ".jpg", ".jpeg")
+        extension = get_logo_extension(file)
 
         filename = f"{uuid4()}{extension}"
         new_logo_path = f"static/team-logos/{filename}" if file is not None else None

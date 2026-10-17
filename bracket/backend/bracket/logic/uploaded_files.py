@@ -3,6 +3,7 @@ from pathlib import Path
 
 import aiofiles
 import aiofiles.os
+from fastapi import UploadFile
 from starlette.exceptions import HTTPException
 from starlette.staticfiles import StaticFiles
 from starlette.types import Scope
@@ -11,6 +12,18 @@ from bracket.database import database
 from bracket.utils.logging import logger
 
 STATIC_ROOT = Path("static")
+ALLOWED_LOGO_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
+
+
+def get_logo_extension(file: UploadFile) -> str:
+    """Extensión normalizada (minúsculas). Responde 400 en vez de romper con un 500."""
+    extension = os.path.splitext(file.filename or "")[1].lower()
+    if extension not in ALLOWED_LOGO_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Formato de imagen no soportado. Usá: {', '.join(ALLOWED_LOGO_EXTENSIONS)}",
+        )
+    return extension
 
 
 def _relative_key(file_path: str) -> str:
