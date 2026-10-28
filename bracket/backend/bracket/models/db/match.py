@@ -176,7 +176,6 @@ class MatchPlayerStats(BaseModel):
     team_id: TeamId
     goals: int = Field(default=0, ge=0)
     assists: int = Field(default=0, ge=0)
-    own_goals: int = Field(default=0, ge=0)
 
 
 class MatchPlayerStatsDetail(BaseModel):
@@ -188,7 +187,6 @@ class MatchPlayerStatsDetail(BaseModel):
     team_name: str
     goals: int = 0
     assists: int = 0
-    own_goals: int = 0
 
 
 class MatchFinishBody(BaseModel):

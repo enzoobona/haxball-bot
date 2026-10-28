@@ -9,8 +9,11 @@ import { obtenerTorneo } from "./bracket-api/tournaments.js";
 import { obtenerJugadores } from "./bracket-api/players.js";
 import { obtenerEquipos } from "./bracket-api/teams.js";
 import { obtenerPartido, finalizarPartido, resetearPartido } from "./bracket-api/matches.js";
+import { obtenerIdentidades, vincularHaxball } from "./bracket-api/identities.js";
+import { getApiErrorMessage } from "./bracket-api/api.js";
 
 import { createAuthStore, normalizeName } from "./lib/authStore.js";
+import { checkJoin, createIdentityDirectory, resolveRosterPlayer } from "./lib/identity.js";
 import { createResultQueue, flushQueue, isAlreadyRegisteredError } from "./lib/resultQueue.js";
 import { hasAdminAuthConfigured, loadSettings } from "./lib/settings.js";
 import { createTeamStyles, loadTeamConfig } from "./lib/teamStyles.js";
@@ -39,8 +42,20 @@ HaxballJS().then(async (HBInit) => {
     // Resultados que no se pudieron enviar a Bracket (se reintentan solos).
     const resultQueue = createResultQueue(path.join(dataDir, "pending-results.json"));
 
-    // Vincula nombres inscriptos con su auth de Haxball (anti-suplantación).
+    // Vincula nombres inscriptos SIN cuenta con su auth de Haxball (anti-suplantación local).
     const authStore = createAuthStore(path.join(dataDir, "auth-map.json"));
+
+    // Jugadores CON cuenta: auth -> perfil, tal como lo guarda el servidor (se vincula con !vincular).
+    const identityDirectory = createIdentityDirectory();
+
+    // id de sala -> perfil de quien está conectado y fue reconocido por su auth.
+    const roomProfiles = new Map();
+
+    // Intentos fallidos de !vincular por jugador (se expulsa al llegar a 5).
+    const linkFailures = new Map();
+
+    // La sala se crea más abajo, pero Bracket se carga antes: se guarda acá para poder consultarla.
+    let roomInstance = null;
 
     // Camisetas: teams-config.json + estilo generado para cualquier otro equipo de Bracket.
     const teamStyles = createTeamStyles(
@@ -77,6 +92,38 @@ HaxballJS().then(async (HBInit) => {
         );
 
         teamStyles.setBracketTeams(teamsData);
+
+        await refreshIdentities();
+    }
+
+    // Trae la lista auth -> perfil. Si falla (por ejemplo, un Bracket sin esta función), se
+    // conserva la anterior y el bot sigue funcionando como antes para quien no tiene cuenta.
+    async function refreshIdentities() {
+        try {
+            identityDirectory.load(await obtenerIdentidades());
+        } catch (error) {
+            console.warn(
+                "No se pudo traer las identidades de jugadores con cuenta " +
+                `(las cuentas vinculadas no se reconocen hasta el próximo refresco): ${error.message}`
+            );
+        }
+
+        // Quien ya está en la sala puede haberse vinculado (o desvinculado) desde la web.
+        for (const current of roomInstance?.getPlayerList() ?? []) {
+            attachProfile(current);
+        }
+    }
+
+    function attachProfile(player) {
+        const profile = identityDirectory.getByAuth(player.auth);
+
+        if (profile) {
+            roomProfiles.set(player.id, profile);
+        } else {
+            roomProfiles.delete(player.id);
+        }
+
+        return profile;
     }
 
     try {
@@ -101,16 +148,18 @@ HaxballJS().then(async (HBInit) => {
         process.exit(1);
     }
 
-    function findBracketPlayer(player) {
-        const wanted = normalizeName(player.name);
-
-        return bracketPlayers.find(
-            bracketPlayer => normalizeName(bracketPlayer.name) === wanted
-        ) ?? null;
+    // Fila de Bracket que corresponde a un jugador de la sala: la vinculada a su cuenta si fue
+    // reconocido; si no, la que se llama igual (jugadores sin cuenta).
+    function findBracketPlayer(player, profile = roomProfiles.get(player.id) ?? null) {
+        return resolveRosterPlayer(bracketPlayers, {
+            name: player.name,
+            profile,
+            directory: identityDirectory
+        });
     }
 
-    function getBracketPlayerId(player) {
-        return findBracketPlayer(player)?.id ?? null;
+    function getBracketPlayerId(player, profile) {
+        return findBracketPlayer(player, profile)?.id ?? null;
     }
 
     // Arma las estadísticas que se mandan a Bracket. Un jugador que no se pueda
@@ -127,7 +176,7 @@ HaxballJS().then(async (HBInit) => {
         const seen = new Set();
 
         for (const stat of finalStats) {
-            const bracketPlayerId = getBracketPlayerId(stat.player);
+            const bracketPlayerId = getBracketPlayerId(stat.player, stat.profile);
 
             if (bracketPlayerId === null) {
                 skipped.push(stat.player.name);
@@ -150,8 +199,7 @@ HaxballJS().then(async (HBInit) => {
                 player_id: bracketPlayerId,
                 team_id: stat.teamId,
                 goals: stat.goals,
-                assists: stat.assists,
-                own_goals: stat.ownGoals ?? 0
+                assists: stat.assists
             });
         }
 
@@ -225,6 +273,8 @@ HaxballJS().then(async (HBInit) => {
     if (settings.roomPassword) roomConfig.password = settings.roomPassword;
 
     const room = HBInit(roomConfig);
+
+    roomInstance = room;
 
     room.setDefaultStadium("Big");
     room.setScoreLimit(0);
@@ -571,10 +621,11 @@ HaxballJS().then(async (HBInit) => {
 
         stats.push({
             player,
+            // Se guarda acá porque el jugador puede irse de la sala antes de que termine el partido.
+            profile: roomProfiles.get(player.id) ?? null,
             teamId,
             goals: 0,
-            assists: 0,
-            ownGoals: 0
+            assists: 0
         });
     }
 
@@ -601,14 +652,6 @@ HaxballJS().then(async (HBInit) => {
         if (!stat) return;
 
         stat.goals++;
-    }
-
-    function playerOwnGoal(player) {
-        const stat = getPlayerStats(player);
-
-        if (!stat) return;
-
-        stat.ownGoals++;
     }
 
     function playerAssist(player) {
@@ -732,14 +775,14 @@ HaxballJS().then(async (HBInit) => {
     }
 
     // Gol en contra: el último toque fue de un jugador del equipo que RECIBIÓ el gol.
+    // Cuenta para el marcador del rival y se anuncia en la sala, pero NO es una estadística
+    // del jugador (los jugadores no tienen goles en contra).
     function checkOwnGoal(teamNumber) {
         if (lastTouch === null) return null;
 
         const player = room.getPlayer(lastTouch);
 
         if (!player || player.team === 0 || player.team === teamNumber) return null;
-
-        playerOwnGoal(player);
 
         return player;
     }
@@ -934,8 +977,7 @@ HaxballJS().then(async (HBInit) => {
                 console.log(
                     `${stat.player.name}: ` +
                     `${stat.goals} gol/es, ` +
-                    `${stat.assists} asistencia/s, ` +
-                    `${stat.ownGoals} en contra`
+                    `${stat.assists} asistencia/s`
                 );
             }
 
@@ -951,7 +993,7 @@ HaxballJS().then(async (HBInit) => {
             stopRecording(`partido-${match.id}`);
 
             // Un jugador inscripto hace pocos minutos todavía no está en memoria.
-            if (finalStats.some(stat => getBracketPlayerId(stat.player) === null)) {
+            if (finalStats.some(stat => getBracketPlayerId(stat.player, stat.profile) === null)) {
                 try {
                     await refreshBracketData();
                 } catch (error) {
@@ -1262,8 +1304,7 @@ HaxballJS().then(async (HBInit) => {
 
         for (const stat of orderedStats) {
             room.sendAnnouncement(
-                `${stat.player.name}: ⚽ ${stat.goals} | 🅰️ ${stat.assists}` +
-                    (stat.ownGoals > 0 ? ` | 🥅 ${stat.ownGoals} en contra` : ""),
+                `${stat.player.name}: ⚽ ${stat.goals} | 🅰️ ${stat.assists}`,
                 player.id,
                 0xFFFFFF
             );
@@ -1307,7 +1348,7 @@ HaxballJS().then(async (HBInit) => {
 
     function showHelp(player) {
         room.sendAnnouncement(
-            "📖 !score | !teams | !lineup | !time | !stats | !mvp | !players | !help",
+            "📖 !score | !teams | !lineup | !time | !stats | !mvp | !players | !vincular CODIGO | !yo | !help",
             player.id,
             0xFFFFFF
         );
@@ -1597,7 +1638,9 @@ HaxballJS().then(async (HBInit) => {
         if (!findBracketPlayer(player)) {
             sendError(
                 player,
-                "Tu nombre no coincide con ningún jugador inscripto en Bracket. Podés mirar el partido."
+                roomProfiles.has(player.id)
+                    ? "Tu cuenta no está vinculada a ningún jugador inscripto en este torneo. Podés mirar el partido."
+                    : "Tu nombre no coincide con ningún jugador inscripto en Bracket. Podés mirar el partido."
             );
 
             return;
@@ -1641,8 +1684,33 @@ HaxballJS().then(async (HBInit) => {
             return;
         }
 
-        // Identidad: un nombre inscripto en Bracket queda vinculado al auth de quien lo usó primero.
-        if (findBracketPlayer(player)) {
+        // Jugadores con cuenta: se los reconoce por su auth. Los nombres de quienes ya vincularon
+        // un navegador están reservados, y quien no es reconocido no puede usarlos.
+        const decision = checkJoin({
+            name: player.name,
+            auth: player.auth,
+            directory: identityDirectory,
+            bracketPlayers
+        });
+
+        if (decision.action === "kick") {
+            room.kickPlayer(player.id, decision.message, false);
+
+            return;
+        }
+
+        if (decision.profile) {
+            attachProfile(player);
+
+            console.log(`"${player.name}" reconocido como jugador "${decision.profile.name}".`);
+
+            room.sendAnnouncement(
+                `✅ Te reconocí: sos ${decision.profile.name}.`,
+                player.id,
+                0x00FF00
+            );
+        } else if (findBracketPlayer(player)) {
+            // Sin cuenta: un nombre inscripto en Bracket queda vinculado al auth de quien lo usó primero.
             const identity = authStore.checkAndBind(player.name, player.auth);
 
             if (identity === "mismatch") {
@@ -1668,6 +1736,8 @@ HaxballJS().then(async (HBInit) => {
 
     room.onPlayerLeave = function(player) {
         adminFailures.delete(player.id);
+        linkFailures.delete(player.id);
+        roomProfiles.delete(player.id);
 
         updateAdmins();
         updatePlayerList();
@@ -1800,7 +1870,11 @@ HaxballJS().then(async (HBInit) => {
     // COMMANDS
     // ============================================================
 
-    room.onPlayerChat = async function(player, message) {
+    // Haxball necesita el booleano en el acto ("false" oculta el mensaje del chat). Una función
+    // async devuelve una Promesa, que siempre cuenta como "true" y dejaría a la vista el código de
+    // !vincular y la clave de !admin. Por eso esta función es síncrona y el trabajo que espera a la
+    // API (handleCommand) corre aparte.
+    room.onPlayerChat = function(player, message) {
         if (!message.startsWith(prefijo)) {
             const mutedExpiry = mutedUntil.get(playerKey(player));
 
@@ -1820,6 +1894,15 @@ HaxballJS().then(async (HBInit) => {
             return true;
         }
 
+        handleCommand(player, message).catch(error => {
+            console.error(`Error en el comando de "${player.name}":`, error);
+        });
+
+        // Los comandos nunca se muestran en el chat.
+        return false;
+    };
+
+    async function handleCommand(player, message) {
         const args = message
             .slice(prefijo.length)
             .trim()
@@ -1908,6 +1991,90 @@ HaxballJS().then(async (HBInit) => {
                 }
 
                 showPlayers(player);
+                return false;
+            }
+
+            // Se vincula el navegador a la cuenta de la web. Devuelve false SIEMPRE: así el código
+            // no se ve en el chat (y además vence rápido y se gasta al usarse).
+            case "vincular": {
+                if (!player.auth) {
+                    sendError(
+                        player,
+                        "Haxball no te entregó una identidad (auth), así que no se puede vincular este navegador."
+                    );
+
+                    return false;
+                }
+
+                if ((linkFailures.get(player.id) ?? 0) >= 5) {
+                    room.kickPlayer(player.id, "Demasiados intentos de vinculación fallidos.", false);
+
+                    return false;
+                }
+
+                if (args.length < 1) {
+                    sendError(
+                        player,
+                        "Uso: !vincular CODIGO  (generá el código en la web, en Mi jugador > Vincular Haxball)"
+                    );
+
+                    return false;
+                }
+
+                try {
+                    const result = await vincularHaxball(args.join(""), player.auth);
+
+                    linkFailures.delete(player.id);
+
+                    await refreshBracketData();
+
+                    room.sendAnnouncement(
+                        `✅ Listo: este navegador quedó vinculado al jugador "${result?.name}". ` +
+                        "Desde ahora te reconozco en cualquier sala, sin clave.",
+                        player.id,
+                        0x00FF00,
+                        "bold"
+                    );
+
+                    const row = findBracketPlayer(player);
+
+                    room.sendAnnouncement(
+                        row
+                            ? `🏆 En este torneo figurás inscripto como "${row.name}".`
+                            : "ℹ️ Todavía no figurás inscripto en este torneo: pedile al organizador que te vincule.",
+                        player.id,
+                        0xFFFFFF
+                    );
+                } catch (error) {
+                    linkFailures.set(player.id, (linkFailures.get(player.id) ?? 0) + 1);
+
+                    sendError(player, getApiErrorMessage(error, "No se pudo vincular. Probá de nuevo."));
+                }
+
+                return false;
+            }
+
+            case "yo": {
+                const profile = roomProfiles.get(player.id) ?? null;
+
+                if (!profile) {
+                    sendError(
+                        player,
+                        "No estás vinculado a ninguna cuenta. Generá un código en la web y escribí !vincular CODIGO."
+                    );
+
+                    return false;
+                }
+
+                const row = findBracketPlayer(player);
+
+                room.sendAnnouncement(
+                    `👤 Sos el jugador "${profile.name}". ` +
+                    (row ? `Inscripto en este torneo como "${row.name}".` : "No figurás inscripto en este torneo."),
+                    player.id,
+                    0xFFFFFF
+                );
+
                 return false;
             }
 
@@ -2591,6 +2758,15 @@ HaxballJS().then(async (HBInit) => {
 
                 const { name } = splitNameArg(args);
 
+                if (identityDirectory.reservedBy(name) !== null) {
+                    sendError(
+                        player,
+                        `"${name}" es un jugador con cuenta: él mismo gestiona sus navegadores desde la web.`
+                    );
+
+                    return false;
+                }
+
                 if (!authStore.unbind(name)) {
                     sendError(player, `"${name}" no tiene una identidad vinculada.`);
                     return false;
@@ -2698,5 +2874,5 @@ HaxballJS().then(async (HBInit) => {
                 return false;
             }
         }
-    };
+    }
 });

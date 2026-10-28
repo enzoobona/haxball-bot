@@ -26,25 +26,24 @@ from tests.integration_tests.sql import inserted_tournament
 async def test_tournaments_endpoint(
     startup_and_shutdown_uvicorn_server: None, auth_context: AuthContext
 ) -> None:
-    assert await send_auth_request(HTTPMethod.GET, "tournaments", auth_context, {}) == {
-        "data": [
-            {
-                "id": auth_context.tournament.id,
-                "club_id": auth_context.club.id,
-                "created": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
-                "start_time": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
-                "name": "Some Cool Tournament",
-                "logo_path": None,
-                "dashboard_public": True,
-                "dashboard_endpoint": "endpoint-test",
-                "players_can_be_in_multiple_teams": True,
-                "auto_assign_courts": True,
-                "duration_minutes": 10,
-                "margin_minutes": 5,
-                "status": "OPEN",
-            }
-        ],
-    }
+    response = await send_auth_request(HTTPMethod.GET, "tournaments", auth_context, {})
+
+    # El administrador de la instalacion ve todos los torneos (puede haber otros en la base).
+    assert {
+        "id": auth_context.tournament.id,
+        "club_id": auth_context.club.id,
+        "created": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
+        "start_time": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
+        "name": "Some Cool Tournament",
+        "logo_path": None,
+        "dashboard_public": True,
+        "dashboard_endpoint": "endpoint-test",
+        "players_can_be_in_multiple_teams": True,
+        "auto_assign_courts": True,
+        "duration_minutes": 10,
+        "margin_minutes": 5,
+        "status": "OPEN",
+    } in response["data"]
 
 
 @pytest.mark.asyncio(loop_scope="session")

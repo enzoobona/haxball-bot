@@ -7,7 +7,7 @@ import TournamentModal from '@components/modals/tournament_modal';
 import { TournamentFilter } from '@components/utils/tournament';
 import { capitalize } from '@components/utils/util';
 import { checkForAuthError, getTournaments } from '@services/adapter';
-import { tokenPresent } from '@services/local_storage';
+import { isAdminSession } from '@services/local_storage';
 import Layout from './_layout';
 import classes from './index.module.css';
 import PublicHomePage from './public_home';
@@ -49,7 +49,8 @@ function AdminHomePage() {
   );
 }
 
-// Quien no inició sesión ve la portada pública; el organizador (con sesión) ve su panel.
+// Quien no es administrador (visitantes y jugadores con cuenta) ve la portada pública; el
+// organizador (ADMIN) ve su panel.
 export default function HomePage() {
-  return tokenPresent() ? <AdminHomePage /> : <PublicHomePage />;
+  return isAdminSession() ? <AdminHomePage /> : <PublicHomePage />;
 }

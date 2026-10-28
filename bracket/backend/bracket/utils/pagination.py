@@ -14,7 +14,7 @@ class Pagination:
 @dataclass
 class PaginationPlayers(Pagination):
     sort_by: Literal[
-        "name", "elo_score", "swiss_score", "wins", "draws", "losses", "active", "created", "goals", "assists", "own_goals"
+        "name", "elo_score", "swiss_score", "wins", "draws", "losses", "active", "created", "goals", "assists"
     ] = "name"
 
 

@@ -6,7 +6,7 @@ from starlette import status
 
 from bracket.config import config
 from bracket.logic.subscriptions import setup_demo_account
-from bracket.models.db.account import UserAccountType
+from bracket.models.db.account import UserAccountType, UserRole
 from bracket.models.db.user import (
     DemoUserToRegister,
     UserInsertable,
@@ -91,6 +91,8 @@ async def register_user(user_to_register: UserToRegister) -> TokenResponse:
         name=user_to_register.name,
         created=datetime_utc.now(),
         account_type=UserAccountType.REGULAR,
+        # Quien se registra en la web es un jugador: no puede crear ni editar torneos.
+        role=UserRole.USER,
     )
     if await check_whether_email_is_in_use(user.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
@@ -101,7 +103,12 @@ async def register_user(user_to_register: UserToRegister) -> TokenResponse:
         data={"user": user_created.email}, expires_delta=access_token_expires
     )
     return TokenResponse(
-        data=Token(access_token=access_token, token_type="bearer", user_id=user_created.id)
+        data=Token(
+            access_token=access_token,
+            token_type="bearer",
+            user_id=user_created.id,
+            role=user_created.role,
+        )
     )
 
 
@@ -122,6 +129,8 @@ async def register_demo_user(user_to_register: DemoUserToRegister) -> TokenRespo
         name=username,
         created=datetime_utc.now(),
         account_type=UserAccountType.DEMO,
+        # La cuenta demo es administradora solo de su propio club de prueba.
+        role=UserRole.ADMIN,
     )
     if await check_whether_email_is_in_use(user.email):
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Email address already in use")
@@ -133,5 +142,10 @@ async def register_demo_user(user_to_register: DemoUserToRegister) -> TokenRespo
     )
     await setup_demo_account(user_created.id)
     return TokenResponse(
-        data=Token(access_token=access_token, token_type="bearer", user_id=user_created.id)
+        data=Token(
+            access_token=access_token,
+            token_type="bearer",
+            user_id=user_created.id,
+            role=user_created.role,
+        )
     )

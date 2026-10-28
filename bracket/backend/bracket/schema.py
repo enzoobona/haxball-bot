@@ -1,12 +1,14 @@
 from sqlalchemy import (
     Column,
     ForeignKey,
+    Index,
     Integer,
     LargeBinary,
     String,
     Table,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.orm import declarative_base  # type: ignore[attr-defined]
 from sqlalchemy.sql.sqltypes import BigInteger, Boolean, DateTime, Enum, Float, Text
@@ -197,9 +199,25 @@ players = Table(
 
     Column("goals", Integer, nullable=False, server_default="0"),
     Column("assists", Integer, nullable=False, server_default="0"),
-    Column("own_goals", Integer, nullable=False, server_default="0"),
 
     Column("active", Boolean, nullable=False, index=True, server_default="t"),
+
+    # Jugador con cuenta (perfil) al que pertenece esta fila del torneo. NULL = jugador sin cuenta.
+    Column(
+        "profile_id",
+        BigInteger,
+        ForeignKey("player_profiles.id", ondelete="SET NULL"),
+        index=True,
+        nullable=True,
+    ),
+    # Un perfil no puede tener dos filas en el mismo torneo.
+    Index(
+        "ix_players_tournament_profile",
+        "tournament_id",
+        "profile_id",
+        unique=True,
+        postgresql_where=text("profile_id IS NOT NULL"),
+    ),
 )
 
 users = Table(
@@ -219,6 +237,65 @@ users = Table(
         ),
         nullable=False,
     ),
+    Column(
+        "role",
+        Enum(
+            "ADMIN",
+            "USER",
+            name="user_role",
+        ),
+        nullable=False,
+        server_default="USER",
+    ),
+)
+
+# Jugador con cuenta: un perfil por usuario, con su propio id y stats acumuladas entre torneos.
+player_profiles = Table(
+    "player_profiles",
+    metadata,
+    Column("id", BigInteger, primary_key=True, index=True, autoincrement=True),
+    Column("user_id", BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+    Column("name", String, nullable=False),
+    # Nombre normalizado (sin tildes, en minusculas): es lo que se compara y se reserva.
+    Column("name_key", String, nullable=False),
+    Column("created", DateTimeTZ, nullable=False, server_default=func.now()),
+    UniqueConstraint("user_id"),
+    UniqueConstraint("name_key"),
+)
+
+# `auth` de Haxball (clave estable por navegador) vinculados a un perfil.
+haxball_identities = Table(
+    "haxball_identities",
+    metadata,
+    Column("id", BigInteger, primary_key=True, index=True, autoincrement=True),
+    Column(
+        "profile_id",
+        BigInteger,
+        ForeignKey("player_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    ),
+    Column("auth", String, nullable=False),
+    Column("created", DateTimeTZ, nullable=False, server_default=func.now()),
+    UniqueConstraint("auth"),
+)
+
+# Codigos de un solo uso para vincular un navegador. Solo se guarda el hash.
+haxball_link_codes = Table(
+    "haxball_link_codes",
+    metadata,
+    Column("id", BigInteger, primary_key=True, index=True, autoincrement=True),
+    Column(
+        "user_id",
+        BigInteger,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    ),
+    Column("code_hash", String, nullable=False),
+    Column("expires_at", DateTimeTZ, nullable=False),
+    Column("created", DateTimeTZ, nullable=False, server_default=func.now()),
+    UniqueConstraint("code_hash"),
 )
 
 users_x_clubs = Table(
@@ -314,13 +391,6 @@ match_player_stats = Table(
 
     Column(
         "assists",
-        Integer,
-        nullable=False,
-        server_default="0",
-    ),
-
-    Column(
-        "own_goals",
         Integer,
         nullable=False,
         server_default="0",

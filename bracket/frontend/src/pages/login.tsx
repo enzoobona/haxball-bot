@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { tokenPresent } from '@services/local_storage';
+import { isPlayerSession, tokenPresent } from '@services/local_storage';
 import { performLogin } from '@services/user';
 
 export default function LoginPage() {
@@ -23,7 +23,7 @@ export default function LoginPage() {
   const { t } = useTranslation();
   useEffect(() => {
     if (tokenPresent()) {
-      navigate('/');
+      navigate(isPlayerSession() ? '/jugador' : '/');
     }
   }, []);
 
@@ -37,7 +37,8 @@ export default function LoginPage() {
         message: '',
       });
 
-      await navigate('/');
+      // Los jugadores con cuenta no tienen panel de organizador: van a su página.
+      await navigate(isPlayerSession() ? '/jugador' : '/');
     }
   }
 

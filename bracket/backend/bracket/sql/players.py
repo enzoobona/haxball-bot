@@ -4,9 +4,10 @@ from heliclockter import datetime_utc
 
 from bracket.database import database
 from bracket.logic.ranking.statistics import START_ELO
-from bracket.models.db.player import Player, PlayerBody, PlayerToInsert
+from bracket.models.db.player import Player, PlayerBody, PlayerToInsert, PlayerWithProfile
 from bracket.schema import players
-from bracket.utils.id_types import PlayerId, TournamentId
+from bracket.sql.profiles import sql_find_profile_id_for_new_player
+from bracket.utils.id_types import PlayerId, PlayerProfileId, TournamentId
 from bracket.utils.pagination import PaginationPlayers
 from bracket.utils.types import dict_without_none
 
@@ -16,7 +17,7 @@ async def get_all_players_in_tournament(
     *,
     not_in_team: bool = False,
     pagination: PaginationPlayers | None = None,
-) -> list[Player]:
+) -> list[PlayerWithProfile]:
     not_in_team_filter = "AND players.team_id IS NULL" if not_in_team else ""
     limit_filter = "LIMIT :limit" if pagination is not None and pagination.limit is not None else ""
     offset_filter = (
@@ -25,7 +26,10 @@ async def get_all_players_in_tournament(
     sort_by = pagination.sort_by if pagination is not None else "name"
     sort_direction = pagination.sort_direction if pagination is not None else ""
     query = f"""
-        SELECT *
+        SELECT
+            players.*,
+            (SELECT pp.name FROM player_profiles AS pp WHERE pp.id = players.profile_id)
+                AS profile_name
         FROM players
         WHERE players.tournament_id = :tournament_id
         {not_in_team_filter}
@@ -45,7 +49,7 @@ async def get_all_players_in_tournament(
         ),
     )
 
-    return [Player.model_validate(x) for x in result]
+    return [PlayerWithProfile.model_validate(x) for x in result]
 
 
 async def get_player_by_id(player_id: PlayerId, tournament_id: TournamentId) -> Player | None:
@@ -89,6 +93,9 @@ async def sql_delete_players_of_tournament(tournament_id: TournamentId) -> None:
 
 
 async def insert_player(player_body: PlayerBody, tournament_id: TournamentId) -> None:
+    # Si ya hay un jugador con cuenta con ese nombre, la fila nace vinculada a su perfil.
+    profile_id = await sql_find_profile_id_for_new_player(player_body.name, tournament_id)
+
     await database.execute(
         query=players.insert(),
         values=PlayerToInsert(
@@ -97,5 +104,20 @@ async def insert_player(player_body: PlayerBody, tournament_id: TournamentId) ->
             tournament_id=tournament_id,
             elo_score=START_ELO,
             swiss_score=Decimal("0.0"),
+            profile_id=profile_id,
         ).model_dump(),
+    )
+
+
+async def sql_set_player_profile(
+    tournament_id: TournamentId, player_id: PlayerId, profile_id: PlayerProfileId | None
+) -> None:
+    """Vincula (o desvincula, con None) una fila de jugador de un torneo con un perfil."""
+    await database.execute(
+        query="""
+            UPDATE players
+            SET profile_id = :profile_id
+            WHERE id = :player_id AND tournament_id = :tournament_id
+        """,
+        values={"profile_id": profile_id, "player_id": player_id, "tournament_id": tournament_id},
     )

@@ -13,7 +13,7 @@ function groupByTeam(rows: MatchPlayerStatsRow[]) {
   return [...groups.values()];
 }
 
-/** Goles, asistencias y goles en contra de cada jugador en un partido ya jugado. */
+/** Goles y asistencias de cada jugador en un partido ya jugado. */
 export default function MatchPlayerStatsTable({
   tournamentId,
   matchId,
@@ -45,7 +45,6 @@ export default function MatchPlayerStatsTable({
                 <Table.Th>{group.teamName}</Table.Th>
                 <Table.Th ta="center">{t('goals_label')}</Table.Th>
                 <Table.Th ta="center">{t('assists_label')}</Table.Th>
-                <Table.Th ta="center">{t('own_goals_label')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -54,7 +53,6 @@ export default function MatchPlayerStatsTable({
                   <Table.Td>{row.player_name}</Table.Td>
                   <Table.Td ta="center">{row.goals}</Table.Td>
                   <Table.Td ta="center">{row.assists}</Table.Td>
-                  <Table.Td ta="center">{row.own_goals}</Table.Td>
                 </Table.Tr>
               ))}
             </Table.Tbody>

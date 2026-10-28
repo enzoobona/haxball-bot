@@ -10,11 +10,12 @@ from starlette.requests import Request
 
 from bracket.config import config
 from bracket.database import database
+from bracket.models.db.account import UserRole
 from bracket.models.db.tournament import Tournament
 from bracket.models.db.user import UserInDB, UserPublic
 from bracket.schema import tournaments
 from bracket.sql.tournaments import sql_get_tournament_by_endpoint_name
-from bracket.sql.users import get_user, get_user_access_to_club, get_user_access_to_tournament
+from bracket.sql.users import get_user, user_can_manage_club, user_can_manage_tournament
 from bracket.utils.db import fetch_all_parsed
 from bracket.utils.id_types import ClubId, TournamentId, UserId
 from bracket.utils.security import verify_password
@@ -49,6 +50,8 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     user_id: UserId
+    # El frontend lo usa para decidir que pantallas mostrar (el backend siempre lo vuelve a validar).
+    role: UserRole = UserRole.USER
 
 
 class TokenData(BaseModel):
@@ -100,12 +103,23 @@ async def user_authenticated(token: str = Depends(oauth2_scheme)) -> UserPublic:
     return UserPublic.model_validate(user.model_dump())
 
 
+async def admin_authenticated(user: UserPublic = Depends(user_authenticated)) -> UserPublic:
+    """Cualquier accion de creacion o edicion exige el rol ADMIN."""
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access is required for this action",
+        )
+
+    return user
+
+
 async def user_authenticated_for_tournament(
     tournament_id: TournamentId, token: str = Depends(oauth2_scheme)
 ) -> UserPublic:
     user = await check_jwt_and_get_user(token)
 
-    if not user or not await get_user_access_to_tournament(tournament_id, user.id):
+    if not user or not await user_can_manage_tournament(user, tournament_id):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -120,7 +134,7 @@ async def user_authenticated_for_club(
 ) -> UserPublic:
     user = await check_jwt_and_get_user(token)
 
-    if not user or not await get_user_access_to_club(club_id, user.id):
+    if not user or not await user_can_manage_club(user, club_id):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -136,7 +150,7 @@ async def user_authenticated_or_public_dashboard(
     try:
         token: str = assert_some(await oauth2_scheme(request))
         user = await check_jwt_and_get_user(token)
-        if user is not None and await get_user_access_to_tournament(tournament_id, user.id):
+        if user is not None and await user_can_manage_tournament(user, tournament_id):
             return user
     except HTTPException:
         pass
@@ -190,7 +204,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token(
         data={"user": user.email}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer", user_id=user.id)
+    return Token(access_token=access_token, token_type="bearer", user_id=user.id, role=user.role)
 
 
 # @router.get("/login", summary='SSO login')

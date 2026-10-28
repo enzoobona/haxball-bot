@@ -37,7 +37,7 @@ async def _player_row(player_id: int) -> dict[str, int]:
     assert row is not None
     return {
         key: row[key]
-        for key in ("wins", "draws", "losses", "goals", "assists", "own_goals")
+        for key in ("wins", "draws", "losses", "goals", "assists")
     }
 
 
@@ -126,7 +126,7 @@ async def test_finish_and_reset_match(
                 {"player_id": p1.id, "team_id": team1.id, "goals": 2, "assists": 0},
                 {"player_id": p2.id, "team_id": team1.id, "goals": 0, "assists": 1},
                 {"player_id": p3.id, "team_id": team2.id, "goals": 1, "assists": 0},
-                {"player_id": p4.id, "team_id": team2.id, "own_goals": 1},
+                {"player_id": p4.id, "team_id": team2.id},
             ],
         }
         assert (
@@ -137,18 +137,10 @@ async def test_finish_and_reset_match(
         )
 
         zero = {"wins": 0, "draws": 0, "losses": 0}
-        assert await _player_row(p1.id) == zero | {team1_result: 1} | {
-            "goals": 2, "assists": 0, "own_goals": 0
-        }
-        assert await _player_row(p2.id) == zero | {team1_result: 1} | {
-            "goals": 0, "assists": 1, "own_goals": 0
-        }
-        assert await _player_row(p3.id) == zero | {team2_result: 1} | {
-            "goals": 1, "assists": 0, "own_goals": 0
-        }
-        assert await _player_row(p4.id) == zero | {team2_result: 1} | {
-            "goals": 0, "assists": 0, "own_goals": 1
-        }
+        assert await _player_row(p1.id) == zero | {team1_result: 1} | {"goals": 2, "assists": 0}
+        assert await _player_row(p2.id) == zero | {team1_result: 1} | {"goals": 0, "assists": 1}
+        assert await _player_row(p3.id) == zero | {team2_result: 1} | {"goals": 1, "assists": 0}
+        assert await _player_row(p4.id) == zero | {team2_result: 1} | {"goals": 0, "assists": 0}
 
         # --- detalle por partido (lo usa el frontend) ---
         detail = await send_tournament_request(
@@ -158,7 +150,7 @@ async def test_finish_and_reset_match(
         assert len(by_name) == 4
         assert by_name[p1.name]["goals"] == 2
         assert by_name[p1.name]["team_name"] == team1.name
-        assert by_name[p4.name]["own_goals"] == 1
+        assert "own_goals" not in by_name[p4.name]
         assert by_name[p4.name]["team_id"] == team2.id
 
         # --- no se puede cerrar dos veces ---
@@ -181,7 +173,6 @@ async def test_finish_and_reset_match(
                 "losses": 0,
                 "goals": 0,
                 "assists": 0,
-                "own_goals": 0,
             }
 
         row = await database.fetch_one(matches.select().where(matches.c.id == match.id))

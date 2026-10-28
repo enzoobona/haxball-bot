@@ -24,7 +24,7 @@ from bracket.models.db.tournament import (
 )
 from bracket.models.db.user import UserPublic
 from bracket.routes.auth import (
-    user_authenticated,
+    admin_authenticated,
     user_authenticated_for_tournament,
     user_authenticated_or_public_dashboard,
     user_authenticated_or_public_dashboard_by_endpoint_name,
@@ -47,7 +47,8 @@ from bracket.sql.tournaments import (
     sql_update_tournament,
     sql_update_tournament_status,
 )
-from bracket.sql.users import get_user_access_to_club, get_which_clubs_has_user_access_to
+from bracket.sql.clubs import get_all_clubs
+from bracket.sql.users import get_which_clubs_has_user_access_to, user_can_manage_club
 from bracket.utils.errors import (
     ForeignKey,
     UniqueIndex,
@@ -102,7 +103,16 @@ async def get_tournaments(
             return TournamentsResponse(data=[tournament])
 
         case _, _ if isinstance(user, UserPublic):
-            user_club_ids = await get_which_clubs_has_user_access_to(user.id)
+            if not user.is_admin:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Administrator access is required for this action",
+                )
+
+            if user.is_global_admin:
+                user_club_ids = {club.id for club in await get_all_clubs()}
+            else:
+                user_club_ids = await get_which_clubs_has_user_access_to(user.id)
             return TournamentsResponse(
                 data=await sql_get_tournaments(tuple(user_club_ids), endpoint_name, filter_)
             )
@@ -168,12 +178,12 @@ async def change_status(
 
 @router.post("/tournaments", response_model=SuccessResponse)
 async def create_tournament(
-    tournament_to_insert: TournamentBody, user: UserPublic = Depends(user_authenticated)
+    tournament_to_insert: TournamentBody, user: UserPublic = Depends(admin_authenticated)
 ) -> SuccessResponse:
     existing_tournaments = await sql_get_tournaments((tournament_to_insert.club_id,))
     check_requirement(existing_tournaments, user, "max_tournaments")
 
-    has_access_to_club = await get_user_access_to_club(tournament_to_insert.club_id, user.id)
+    has_access_to_club = await user_can_manage_club(user, tournament_to_insert.club_id)
     if not has_access_to_club:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

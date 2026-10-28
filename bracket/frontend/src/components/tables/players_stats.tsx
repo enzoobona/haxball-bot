@@ -53,8 +53,6 @@ export default function PlayersStatsTable({
             <Text fw={700}>{player.assists ?? 0}</Text>
           </Table.Td>
 
-          <Table.Td>{player.own_goals ?? 0}</Table.Td>
-
           <Table.Td>{player.wins}</Table.Td>
 
           <Table.Td>{player.draws}</Table.Td>
@@ -70,7 +68,7 @@ export default function PlayersStatsTable({
 
   return (
     <>
-      <TableLayout miw={900}>
+      <TableLayout miw={800}>
         <Table.Thead>
           <Table.Tr>
             <ThSortable state={tableState} field="name">
@@ -85,10 +83,6 @@ export default function PlayersStatsTable({
 
             <ThSortable state={tableState} field="assists">
               Asistencias
-            </ThSortable>
-
-            <ThSortable state={tableState} field="own_goals">
-              Goles en contra
             </ThSortable>
 
             <ThSortable state={tableState} field="wins">

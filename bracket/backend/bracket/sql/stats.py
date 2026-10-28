@@ -43,7 +43,6 @@ PLAYER_STATS_SELECT = """
         ) AS matches_played,
         p.goals,
         p.assists,
-        p.own_goals,
         p.wins,
         p.draws,
         p.losses
@@ -107,8 +106,7 @@ async def sql_get_player_match_log(
             CASE WHEN nm.team1_id = mps.team_id THEN nm.score2 ELSE nm.score1 END
                 AS goals_against,
             mps.goals,
-            mps.assists,
-            mps.own_goals
+            mps.assists
         FROM match_player_stats AS mps
         JOIN numbered_matches AS nm ON nm.id = mps.match_id
         JOIN teams AS own ON own.id = mps.team_id

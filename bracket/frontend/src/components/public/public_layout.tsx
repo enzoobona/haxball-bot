@@ -1,5 +1,5 @@
 import { ActionIcon, Anchor, Button, Container, Group } from '@mantine/core';
-import { IconBrandDiscord, IconBrandKick, IconLock } from '@tabler/icons-react';
+import { IconBrandDiscord, IconBrandKick, IconLock, IconUser } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -7,13 +7,13 @@ import { DashboardFooter } from '@components/dashboard/footer';
 import { Brand } from '@components/navbar/_brand';
 import { ColorSchemeToggle } from '@components/utils/color_scheme_toggle';
 import PreloadLink from '@components/utils/link';
-import { tokenPresent } from '@services/local_storage';
+import { getSessionRole } from '@services/local_storage';
 import { DISCORD_URL, STREAM_URL } from '../../config';
 import classes from './public_layout.module.css';
 
 export function PublicHeader() {
   const { t } = useTranslation();
-  const isAdmin = tokenPresent();
+  const role = getSessionRole();
 
   return (
     <header className={classes.header}>
@@ -51,17 +51,29 @@ export function PublicHeader() {
             </ActionIcon>
           ) : null}
           <ColorSchemeToggle />
-          <Anchor
-            component={PreloadLink}
-            href={isAdmin ? '/' : '/login'}
-            c="dimmed"
-            size="xs"
-            className={classes.admin}
-            visibleFrom="sm"
-          >
-            <IconLock size={12} style={{ marginRight: 4 }} />
-            {t('public_admin_access')}
-          </Anchor>
+          {role === 'ADMIN' ? (
+            <Anchor
+              component={PreloadLink}
+              href="/"
+              c="dimmed"
+              size="xs"
+              className={classes.admin}
+              visibleFrom="sm"
+            >
+              <IconLock size={12} style={{ marginRight: 4 }} />
+              {t('public_admin_access')}
+            </Anchor>
+          ) : (
+            <Button
+              component={PreloadLink}
+              href={role === 'USER' ? '/jugador' : '/login'}
+              size="xs"
+              variant={role === 'USER' ? 'filled' : 'default'}
+              leftSection={<IconUser size={14} />}
+            >
+              {role === 'USER' ? t('public_my_player') : t('public_login')}
+            </Button>
+          )}
         </Group>
       </Container>
     </header>

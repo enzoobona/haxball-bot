@@ -21,15 +21,13 @@ export async function agregarEstadisticasJugador(
     tournamentId,
     playerId,
     goals,
-    assists,
-    ownGoals = 0
+    assists
 ) {
     const { data } = await api.post(
         `/tournaments/${tournamentId}/players/${playerId}/stats/increment`,
         {
             goals,
-            assists,
-            own_goals: ownGoals
+            assists
         }
     );
 

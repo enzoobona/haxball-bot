@@ -10,7 +10,7 @@ from bracket.logic.ranking.calculation import (
     recalculate_ranking_for_stage_item,
 )
 from bracket.logic.scheduling.builder import build_matches_for_stage_item
-from bracket.models.db.account import UserAccountType
+from bracket.models.db.account import UserAccountType, UserRole
 from bracket.models.db.club import ClubInsertable
 from bracket.models.db.court import CourtInsertable
 from bracket.models.db.match import Match, MatchBody
@@ -107,6 +107,7 @@ async def create_admin_user() -> UserId:
             password_hash=hash_password(config.admin_password),
             created=datetime_utc.now(),
             account_type=UserAccountType.REGULAR,
+            role=UserRole.ADMIN,
         )
     )
     return user.id

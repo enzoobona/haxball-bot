@@ -10,8 +10,12 @@ from bracket.utils.types import EnumAutoStr
 
 
 class UniqueIndex(EnumAutoStr):
+    haxball_identities_auth_key = auto()
+    ix_players_tournament_profile = auto()
     ix_tournaments_dashboard_endpoint = auto()
     ix_users_email = auto()
+    player_profiles_name_key_key = auto()
+    player_profiles_user_id_key = auto()
     match_player_stats_match_id_player_id_key = auto()
     stage_item_inputs_stage_item_id_team_id_key = auto()
     stage_item_inputs_stage_item_id_winner_from_stage_item_id_w_key = auto()
@@ -30,6 +34,14 @@ class ForeignKey(EnumAutoStr):
 
 
 unique_index_violation_error_lookup = {
+    UniqueIndex.haxball_identities_auth_key: (
+        "This Haxball browser is already linked to a player"
+    ),
+    UniqueIndex.ix_players_tournament_profile: (
+        "This player profile is already linked to another player of this tournament"
+    ),
+    UniqueIndex.player_profiles_name_key_key: "This player name is already taken",
+    UniqueIndex.player_profiles_user_id_key: "This user already has a player profile",
     UniqueIndex.ix_tournaments_dashboard_endpoint: "This dashboard link is already taken",
     UniqueIndex.ix_users_email: "This email is already taken",
     UniqueIndex.match_player_stats_match_id_player_id_key: (

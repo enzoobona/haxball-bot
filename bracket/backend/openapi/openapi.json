@@ -874,12 +874,6 @@
             "title": "Goals",
             "type": "integer"
           },
-          "own_goals": {
-            "default": 0,
-            "minimum": 0.0,
-            "title": "Own Goals",
-            "type": "integer"
-          },
           "player_id": {
             "title": "Player Id",
             "type": "integer"
@@ -893,8 +887,7 @@
           "player_id",
           "team_id",
           "goals",
-          "assists",
-          "own_goals"
+          "assists"
         ],
         "title": "MatchPlayerStats",
         "type": "object"
@@ -910,11 +903,6 @@
           "goals": {
             "default": 0,
             "title": "Goals",
-            "type": "integer"
-          },
-          "own_goals": {
-            "default": 0,
-            "title": "Own Goals",
             "type": "integer"
           },
           "player_id": {
@@ -940,8 +928,7 @@
           "team_id",
           "team_name",
           "goals",
-          "assists",
-          "own_goals"
+          "assists"
         ],
         "title": "MatchPlayerStatsDetail",
         "type": "object"
@@ -1526,11 +1513,6 @@
             "title": "Name",
             "type": "string"
           },
-          "own_goals": {
-            "default": 0,
-            "title": "Own Goals",
-            "type": "integer"
-          },
           "swiss_score": {
             "default": "0.0",
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
@@ -1554,7 +1536,6 @@
           "tournament_id",
           "goals",
           "assists",
-          "own_goals",
           "elo_score",
           "swiss_score",
           "wins",
@@ -1634,10 +1615,6 @@
             ],
             "title": "Opponent Name"
           },
-          "own_goals": {
-            "title": "Own Goals",
-            "type": "integer"
-          },
           "start_time": {
             "anyOf": [
               {
@@ -1670,8 +1647,7 @@
           "goals_for",
           "goals_against",
           "goals",
-          "assists",
-          "own_goals"
+          "assists"
         ],
         "title": "PlayerMatchEntry",
         "type": "object"
@@ -1740,18 +1716,11 @@
             "minimum": 0.0,
             "title": "Goals",
             "type": "integer"
-          },
-          "own_goals": {
-            "default": 0,
-            "minimum": 0.0,
-            "title": "Own Goals",
-            "type": "integer"
           }
         },
         "required": [
           "goals",
-          "assists",
-          "own_goals"
+          "assists"
         ],
         "title": "PlayerStatsBody",
         "type": "object"
@@ -1787,11 +1756,6 @@
           "name": {
             "title": "Name",
             "type": "string"
-          },
-          "own_goals": {
-            "default": 0,
-            "title": "Own Goals",
-            "type": "integer"
           },
           "player_id": {
             "title": "Player Id",
@@ -1833,7 +1797,6 @@
           "matches_played",
           "goals",
           "assists",
-          "own_goals",
           "wins",
           "draws",
           "losses"
@@ -5407,8 +5370,7 @@
                 "active",
                 "created",
                 "goals",
-                "assists",
-                "own_goals"
+                "assists"
               ],
               "title": "Sort By",
               "type": "string"

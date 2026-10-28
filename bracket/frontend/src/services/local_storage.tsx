@@ -29,3 +29,27 @@ export function getLogin() {
 export function tokenPresent() {
   return localStorage.getItem('login') != null;
 }
+
+export type SessionRole = 'ADMIN' | 'USER';
+
+/**
+ * Rol de la sesión actual, o null si no inició sesión.
+ * Solo decide qué pantallas mostrar: el backend vuelve a validar cada acción.
+ */
+export function getSessionRole(): SessionRole | null {
+  if (!tokenPresent()) {
+    return null;
+  }
+
+  // Las sesiones guardadas antes de que existieran los roles no traen `role`, y todas las cuentas
+  // de entonces eran de organizadores.
+  return getLogin().role === 'USER' ? 'USER' : 'ADMIN';
+}
+
+export function isAdminSession() {
+  return getSessionRole() === 'ADMIN';
+}
+
+export function isPlayerSession() {
+  return getSessionRole() === 'USER';
+}

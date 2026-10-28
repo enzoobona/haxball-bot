@@ -49,7 +49,6 @@ export function PlayersTable({
     ['matches_played', t('stats_played_short')],
     ['goals', t('stats_goals_short')],
     ['assists', t('stats_assists_short')],
-    ['own_goals', t('stats_own_goals_short')],
     ['wins', t('stats_wins_short')],
     ['draws', t('stats_draws_short')],
     ['losses', t('stats_losses_short')],

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Annotated
 from heliclockter import datetime_utc
 from pydantic import BaseModel, StringConstraints
 
-from bracket.models.db.account import UserAccountType
+from bracket.models.db.account import UserAccountType, UserRole
 from bracket.models.db.shared import BaseModelORM
 from bracket.utils.id_types import UserId
 
@@ -18,12 +18,25 @@ class UserBase(BaseModelORM):
     name: str
     created: datetime_utc
     account_type: UserAccountType
+    role: UserRole = UserRole.USER
 
     @property
     def subscription(self) -> Subscription:
         from bracket.logic.subscriptions import subscription_lookup
 
         return subscription_lookup[self.account_type]
+
+    @property
+    def is_admin(self) -> bool:
+        return self.role is UserRole.ADMIN
+
+    @property
+    def is_global_admin(self) -> bool:
+        """Administrador de la instalacion: accede a todos los clubes y torneos.
+
+        Las cuentas demo son ADMIN solo dentro de su propio club (su sandbox).
+        """
+        return self.role is UserRole.ADMIN and self.account_type is UserAccountType.REGULAR
 
 
 class UserInsertable(UserBase):

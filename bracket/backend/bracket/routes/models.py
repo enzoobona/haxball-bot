@@ -4,7 +4,14 @@ from bracket.logic.scheduling.handle_stage_activation import StageItemInputUpdat
 from bracket.models.db.club import Club
 from bracket.models.db.court import Court
 from bracket.models.db.match import Match, MatchHaxball, MatchPlayerStatsDetail, SuggestedMatch
-from bracket.models.db.player import Player
+from bracket.models.db.player import Player, PlayerWithProfile
+from bracket.models.db.profile import (
+    HaxballIdentityForBot,
+    HaxballLinkResult,
+    LinkCode,
+    MyHaxball,
+    PlayerProfilePublic,
+)
 from bracket.models.db.ranking import Ranking
 from bracket.models.db.stats import PlayerProfile, PlayerStatsRow, TeamProfile
 from bracket.models.db.stage_item_inputs import (
@@ -45,7 +52,7 @@ class TournamentsResponse(DataResponse[list[Tournament]]):
 
 class PaginatedPlayers(BaseModel):
     count: int
-    players: list[Player]
+    players: list[PlayerWithProfile]
 
 
 class PlayersResponse(DataResponse[PaginatedPlayers]):
@@ -126,4 +133,24 @@ class PlayerProfileResponse(DataResponse[PlayerProfile]):
 
 
 class TeamProfileResponse(DataResponse[TeamProfile]):
+    pass
+
+
+class MyHaxballResponse(DataResponse[MyHaxball]):
+    pass
+
+
+class LinkCodeResponse(DataResponse[LinkCode]):
+    pass
+
+
+class HaxballIdentitiesResponse(DataResponse[list[HaxballIdentityForBot]]):
+    pass
+
+
+class HaxballLinkResponse(DataResponse[HaxballLinkResult]):
+    pass
+
+
+class PlayerProfilesResponse(DataResponse[list[PlayerProfilePublic]]):
     pass

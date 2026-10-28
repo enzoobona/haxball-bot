@@ -39,7 +39,8 @@ services:
       CORS_ORIGINS: https://${DOMAIN}
       SERVE_FRONTEND: "true"
       API_PREFIX: /api
-      ALLOW_USER_REGISTRATION: "false"
+      # Los jugadores se registran solos (rol USER: sin permisos de edicion).
+      ALLOW_USER_REGISTRATION: "true"
       ALLOW_DEMO_USER_REGISTRATION: "false"
     networks:
       - bracket_lan

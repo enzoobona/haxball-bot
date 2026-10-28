@@ -17,8 +17,9 @@ services:
         value: "true"
       - key: API_PREFIX
         value: /api
+      # Los jugadores se registran solos (rol USER: solo ven la parte publica y sus stats).
       - key: ALLOW_USER_REGISTRATION
-        value: "false"
+        value: "true"
       - key: ALLOW_DEMO_USER_REGISTRATION
         value: "false"
       - key: JWT_SECRET

@@ -165,7 +165,6 @@ export interface MatchPlayerStatsRow {
   team_name: string;
   goals: number;
   assists: number;
-  own_goals: number;
 }
 
 export function getMatchPlayerStats(

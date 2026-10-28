@@ -330,8 +330,32 @@ Si no configurás nada, el bot funciona igual que antes.
 * **Identidad**: la primera vez que entra un jugador inscripto, su nombre queda vinculado a su navegador. Si otra persona usa ese nombre, la sala la rechaza. Si el dueño cambió de computadora, un admin usa `!desvincular <nombre>`.
 * **Nombres repetidos** en la sala se rechazan.
 * **Eliminación directa**: si hay empate se juega **muerte súbita** (gana el primer gol; `OVERTIME_SECONDS` define cada período).
-* **Goles en contra** se cuentan aparte y se ven en `!stats` y en el detalle del partido en Bracket.
+* **Goles en contra**: suman al marcador del rival y se anuncian en la sala, pero **no son una estadística del jugador** (no se guardan ni se muestran en `!stats` ni en Bracket).
 * Se guarda un **replay** (`.hbr2`) de cada partido en la carpeta `replays/`.
+
+## Jugadores con cuenta (vincular el navegador)
+
+Los jugadores pueden registrarse en la web de Bracket (tienen rol `USER`: solo ven la parte pública y
+sus estadísticas) y vincular su navegador de Haxball **una sola vez**:
+
+1. En la web, **Mi jugador**: eligen su nombre de jugador y piden **Vincular Haxball**. Reciben un código
+   de un solo uso que vence en 10 minutos.
+2. En la sala escriben `!vincular CODIGO`. El mensaje no se ve en el chat. El bot manda el código y el `auth`
+   del navegador a Bracket y queda guardado el vínculo.
+3. Desde ahí el bot lo reconoce en **cualquier sala**, sin clave (`!yo` muestra cómo te ve el bot).
+   Sus estadísticas de cada torneo se suman a su perfil.
+
+Reglas:
+
+* El **nombre de un jugador con navegador vinculado queda reservado**: si entra otra persona (otro `auth`, o
+  sin `auth`) con ese nombre, la sala la rechaza.
+* Un jugador reconocido puede entrar con cualquier nombre libre: sus estadísticas van a **su** fila del torneo
+  (la vinculada a su perfil), no a la que "se llame igual".
+* Si cambia de computadora o borra los datos del navegador, genera otro código y se vincula de nuevo (hasta 5
+  navegadores por jugador; los gestiona desde la web).
+* Los jugadores **sin cuenta** siguen funcionando como antes (nombre inscripto + vínculo local con `!desvincular`).
+* La cuenta que usa el bot (`BRACKET_USERNAME`) tiene que tener rol `ADMIN`.
+* Cinco `!vincular` fallidos seguidos expulsan al jugador de la sala.
 
 ## Si Bracket falla al terminar un partido
 

@@ -42,6 +42,10 @@ class Config(BaseSettings):
     sentry_dsn: str | None = None
     serve_frontend: bool = False
     api_prefix: str = ""
+    # Si es True, una fila de jugador de un torneo abierto se vincula sola con el perfil cuyo
+    # nombre coincide (al crear el perfil o la fila). Si es False, solo vincula un administrador
+    # a mano (mas seguro: nadie puede reclamar un nombre ajeno antes que su dueno).
+    auto_link_players_by_name: bool = True
 
     def is_cors_enabled(self) -> bool:
         return self.cors_origins != "*"

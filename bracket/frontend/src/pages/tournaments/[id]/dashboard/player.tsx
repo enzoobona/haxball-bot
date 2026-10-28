@@ -71,11 +71,10 @@ export default function DashboardPlayerPage() {
           </div>
         </Group>
 
-        <SimpleGrid cols={{ base: 2, sm: 4, md: 7 }} spacing="sm">
+        <SimpleGrid cols={{ base: 2, sm: 4, md: 6 }} spacing="sm">
           <StatCard label={t('stats_played_short')} value={player.matches_played} />
           <StatCard label={t('goals_label')} value={player.goals} />
           <StatCard label={t('assists_label')} value={player.assists} />
-          <StatCard label={t('own_goals_label')} value={player.own_goals} />
           <StatCard label={t('stats_wins_short')} value={player.wins} />
           <StatCard label={t('stats_draws_short')} value={player.draws} />
           <StatCard label={t('stats_losses_short')} value={player.losses} />
@@ -99,7 +98,6 @@ export default function DashboardPlayerPage() {
                 detail={[
                   m.goals > 0 ? `${m.goals} ${t('stats_goals_short')}` : null,
                   m.assists > 0 ? `${m.assists} ${t('stats_assists_short')}` : null,
-                  m.own_goals > 0 ? `${m.own_goals} ${t('stats_own_goals_short')}` : null,
                 ]
                   .filter(Boolean)
                   .join(' · ')}

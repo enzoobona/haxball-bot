@@ -1,7 +1,13 @@
 from bracket.database import database
 from bracket.logic.tournaments import sql_delete_tournament_completely
-from bracket.models.db.account import UserAccountType
-from bracket.models.db.user import User, UserInDB, UserInsertable, UserPublic, UserToUpdate
+from bracket.models.db.account import UserAccountType, UserRole
+from bracket.models.db.user import (
+    User,
+    UserInDB,
+    UserInsertable,
+    UserPublic,
+    UserToUpdate,
+)
 from bracket.schema import users
 from bracket.sql.clubs import get_clubs_for_user_id, sql_delete_club
 from bracket.sql.tournaments import sql_get_tournaments
@@ -35,6 +41,38 @@ async def get_user_access_to_club(club_id: ClubId, user_id: UserId) -> bool:
     return club_id in await get_which_clubs_has_user_access_to(user_id)
 
 
+async def tournament_exists(tournament_id: TournamentId) -> bool:
+    result = await database.fetch_val(
+        query="SELECT 1 FROM tournaments WHERE id = :tournament_id",
+        values={"tournament_id": tournament_id},
+    )
+    return result is not None
+
+
+async def club_exists(club_id: ClubId) -> bool:
+    result = await database.fetch_val(
+        query="SELECT 1 FROM clubs WHERE id = :club_id", values={"club_id": club_id}
+    )
+    return result is not None
+
+
+async def user_can_manage_tournament(user: UserPublic | UserInDB, tournament_id: TournamentId) -> bool:
+    """Solo un ADMIN gestiona torneos. El administrador de la instalacion accede a todos."""
+    if not user.is_admin:
+        return False
+    if user.is_global_admin:
+        return await tournament_exists(tournament_id)
+    return await get_user_access_to_tournament(tournament_id, user.id)
+
+
+async def user_can_manage_club(user: UserPublic | UserInDB, club_id: ClubId) -> bool:
+    if not user.is_admin:
+        return False
+    if user.is_global_admin:
+        return await club_exists(club_id)
+    return await get_user_access_to_club(club_id, user.id)
+
+
 async def update_user(user_id: UserId, user: UserToUpdate) -> None:
     query = """
         UPDATE users
@@ -55,6 +93,15 @@ async def update_user_account_type(user_id: UserId, account_type: UserAccountTyp
     await database.execute(
         query=query, values={"user_id": user_id, "account_type": account_type.value}
     )
+
+
+async def update_user_role(user_id: UserId, role: UserRole) -> None:
+    query = """
+        UPDATE users
+        SET role = :role
+        WHERE id = :user_id
+        """
+    await database.execute(query=query, values={"user_id": user_id, "role": role.value})
 
 
 async def update_user_password(user_id: UserId, password_hash: str) -> None:
@@ -89,8 +136,8 @@ async def get_expired_demo_users() -> list[UserPublic]:
 
 async def create_user(user: UserInsertable) -> User:
     query = """
-        INSERT INTO users (email, name, password_hash, created, account_type)
-        VALUES (:email, :name, :password_hash, :created, :account_type)
+        INSERT INTO users (email, name, password_hash, created, account_type, role)
+        VALUES (:email, :name, :password_hash, :created, :account_type, :role)
         RETURNING *
         """
     result = await database.fetch_one(
@@ -101,6 +148,7 @@ async def create_user(user: UserInsertable) -> User:
             "email": user.email,
             "created": user.created,
             "account_type": user.account_type.value,
+            "role": user.role.value,
         },
     )
     return User.model_validate(dict(assert_some(result)._mapping))

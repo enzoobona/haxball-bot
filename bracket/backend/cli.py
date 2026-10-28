@@ -12,11 +12,13 @@ from bracket.app import app
 from bracket.config import config
 from bracket.database import database
 from bracket.logger import get_logger
-from bracket.models.db.account import UserAccountType
+from bracket.models.db.account import UserAccountType, UserRole
 from bracket.models.db.user import UserInsertable
 from bracket.sql.users import (
     check_whether_email_is_in_use,
     create_user,
+    get_user,
+    update_user_role,
 )
 from bracket.utils.db_init import sql_create_dev_db
 from bracket.utils.security import hash_password
@@ -82,20 +84,42 @@ async def create_dev_db() -> None:
 @click.option("--email", prompt="Email", help="The email used to log into the account.")
 @click.option("--password", prompt="Password", help="The password used to log into the account.")
 @click.option("--name", prompt="Name", help="The name associated with the account.")
+@click.option(
+    "--role",
+    type=click.Choice(UserRole.values()),
+    default=UserRole.ADMIN.value,
+    show_default=True,
+    help="ADMIN can create and edit tournaments, USER can only see stats.",
+)
 @run_async
-async def register_user(email: str, password: str, name: str) -> None:
+async def register_user(email: str, password: str, name: str, role: str) -> None:
     user = UserInsertable(
         email=email,
         password_hash=hash_password(password),
         name=name,
         created=datetime_utc.now(),
         account_type=UserAccountType.REGULAR,
+        role=UserRole(role),
     )
     if await check_whether_email_is_in_use(email):
         logger.error("Email address already in use")
         raise SystemExit(1)
     user_created = await create_user(user)
     logger.info(f"Created user with id: {user_created.id}")
+
+
+@cli.command()
+@click.option("--email", prompt="Email", help="The email of the account to change.")
+@click.option("--role", type=click.Choice(UserRole.values()), prompt="Role (ADMIN or USER)")
+@run_async
+async def set_user_role(email: str, role: str) -> None:
+    """Promotes (ADMIN) or demotes (USER) an existing account."""
+    user = await get_user(email)
+    if user is None:
+        logger.error("No account with that email")
+        raise SystemExit(1)
+    await update_user_role(user.id, UserRole(role))
+    logger.info(f"{email} is now {role}")
 
 
 if __name__ == "__main__":

@@ -15,7 +15,6 @@ class PlayerStatsRow(BaseModel):
     matches_played: int = 0
     goals: int = 0
     assists: int = 0
-    own_goals: int = 0
     wins: int = 0
     draws: int = 0
     losses: int = 0
@@ -35,7 +34,6 @@ class PlayerMatchEntry(BaseModel):
     goals_against: int
     goals: int
     assists: int
-    own_goals: int
 
 
 class PlayerProfile(BaseModel):

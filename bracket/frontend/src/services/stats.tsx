@@ -13,7 +13,6 @@ export interface PlayerStatsRow {
   matches_played: number;
   goals: number;
   assists: number;
-  own_goals: number;
   wins: number;
   draws: number;
   losses: number;
@@ -31,7 +30,6 @@ export interface PlayerMatchEntry {
   goals_against: number;
   goals: number;
   assists: number;
-  own_goals: number;
 }
 
 export interface PlayerProfile {

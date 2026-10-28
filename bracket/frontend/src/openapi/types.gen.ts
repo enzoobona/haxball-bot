@@ -470,10 +470,6 @@ export type MatchPlayerStats = {
    * Assists
    */
   assists?: number;
-  /**
-   * Own Goals
-   */
-  own_goals?: number;
 };
 
 /**
@@ -705,7 +701,7 @@ export type PaginatedPlayers = {
   /**
    * Players
    */
-  players: Array<Player>;
+  players: Array<PlayerWithProfile>;
 };
 
 /**
@@ -751,10 +747,6 @@ export type Player = {
    */
   assists?: number;
   /**
-   * Own Goals
-   */
-  own_goals?: number;
-  /**
    * Elo Score
    */
   elo_score?: string;
@@ -778,6 +770,10 @@ export type Player = {
    * Id
    */
   id: number;
+  /**
+   * Profile Id
+   */
+  profile_id?: number | null;
 };
 
 /**
@@ -809,6 +805,18 @@ export type PlayerMultiBody = {
 };
 
 /**
+ * PlayerWithProfile
+ *
+ * Fila de jugador de un torneo, con el nombre de la cuenta a la que esta vinculada (si hay).
+ */
+export type PlayerWithProfile = Player & {
+  /**
+   * Profile Name
+   */
+  profile_name?: string | null;
+};
+
+/**
  * PlayerStatsBody
  */
 export type PlayerStatsBody = {
@@ -820,10 +828,6 @@ export type PlayerStatsBody = {
    * Assists
    */
   assists?: number;
-  /**
-   * Own Goals
-   */
-  own_goals?: number;
 };
 
 /**
@@ -1624,6 +1628,7 @@ export type Token = {
    * User Id
    */
   user_id: number;
+  role?: UserRole;
 };
 
 /**
@@ -1813,6 +1818,11 @@ export type UpcomingMatchesResponse = {
 export type UserAccountType = 'REGULAR' | 'DEMO';
 
 /**
+ * UserRole
+ */
+export type UserRole = 'ADMIN' | 'USER';
+
+/**
  * UserPasswordToUpdate
  */
 export type UserPasswordToUpdate = {
@@ -1843,6 +1853,7 @@ export type UserPublic = {
    * Id
    */
   id: number;
+  role?: UserRole;
 };
 
 /**
@@ -2600,8 +2611,7 @@ export type GetPlayersApiTournamentsTournamentIdPlayersGetData = {
       | 'active'
       | 'created'
       | 'goals'
-      | 'assists'
-      | 'own_goals';
+      | 'assists';
   };
   url: '/api/tournaments/{tournament_id}/players';
 };

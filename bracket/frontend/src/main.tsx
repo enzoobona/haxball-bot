@@ -19,6 +19,7 @@ import ClubsPage from './pages/clubs';
 import CreateAccountPage from './pages/create_account';
 import CreateDemoAccountPage from './pages/demo';
 import LoginPage from './pages/login';
+import PlayerPage from './pages/player';
 import PasswordResetPage from './pages/password_reset';
 import DashboardSchedulePage from './pages/tournaments/[id]/dashboard';
 import DashboardNotFoundPage from './pages/tournaments/[id]/dashboard/dashboard_404';
@@ -31,7 +32,7 @@ import DashboardStatsPage from './pages/tournaments/[id]/dashboard/stats';
 import DashboardTeamPage from './pages/tournaments/[id]/dashboard/team';
 import DashboardTeamsPage from './pages/tournaments/[id]/dashboard/teams';
 import PublicHomePage from './pages/public_home';
-import { tokenPresent } from '@services/local_storage';
+import { isAdminSession } from '@services/local_storage';
 import { theme } from './theme';
 import PlayersPage from './pages/tournaments/[id]/players';
 import RankingsPage from './pages/tournaments/[id]/rankings';
@@ -65,7 +66,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <I18nextProvider i18n={i18n}>
           <MantineProvider defaultColorScheme="dark" theme={theme}>
-            {tokenPresent() ? <BracketSpotlight /> : null}
+            {isAdminSession() ? <BracketSpotlight /> : null}
             <Notifications />
             <Routes>
               <Route index element={<HomePage />} />
@@ -74,6 +75,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/clubs" element={<ClubsPage />} />
               <Route path="/demo" element={<CreateDemoAccountPage />} />
               <Route path="/user" element={<UserPage />} />
+              <Route path="/jugador" element={<PlayerPage />} />
               <Route path="/password-reset" element={<PasswordResetPage />} />
               <Route path="/create-account" element={<CreateAccountPage />} />
 

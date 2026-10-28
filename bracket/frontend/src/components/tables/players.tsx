@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { SWRResponse } from 'swr';
 
 import DeleteButton from '@components/buttons/delete';
+import PlayerProfileLinkModal from '@components/modals/player_profile_link_modal';
 import PlayerUpdateModal from '@components/modals/player_update_modal';
 import { NoContent } from '@components/no_content/empty_table_info';
 import { DateTime } from '@components/utils/datetime';
 import RequestErrorAlert from '@components/utils/error_alert';
 import { TableSkeletonSingleColumn } from '@components/utils/skeletons';
 import { TournamentMinimal } from '@components/utils/tournament';
-import { Player, PlayersResponse } from '@openapi';
+import { PlayerWithProfile, PlayersResponse } from '@openapi';
 import { deletePlayer } from '@services/player';
 import TableLayout, { TableState, ThNotSortable, ThSortable, sortTableEntries } from './table';
 
@@ -44,7 +45,7 @@ export default function PlayersTable({
   playerCount: number;
 }) {
   const { t } = useTranslation();
-  const players: Player[] =
+  const players: PlayerWithProfile[] =
     swrPlayersResponse.data != null ? swrPlayersResponse.data.data.players : [];
 
   // const minELOScore = Math.min(...players.map((player) => Number(player.elo_score)));
@@ -58,7 +59,7 @@ export default function PlayersTable({
   }
 
   const rows = players
-    .sort((p1: Player, p2: Player) => sortTableEntries(p1, p2, tableState))
+    .sort((p1: PlayerWithProfile, p2: PlayerWithProfile) => sortTableEntries(p1, p2, tableState))
     .map((player) => (
       <Table.Tr key={player.id}>
         <Table.Td>
@@ -70,6 +71,13 @@ export default function PlayersTable({
         </Table.Td>
         <Table.Td>
           <Text>{player.name}</Text>
+        </Table.Td>
+        <Table.Td>
+          <PlayerProfileLinkModal
+            swrPlayersResponse={swrPlayersResponse}
+            tournament_id={tournamentData.id}
+            player={player}
+          />
         </Table.Td>
         <Table.Td>
           <DateTime datetime={player.created} />
@@ -95,7 +103,7 @@ export default function PlayersTable({
 
   return (
     <>
-      <TableLayout miw={900}>
+      <TableLayout miw={1000}>
         <Table.Thead>
           <Table.Tr>
             <ThSortable state={tableState} field="active">
@@ -104,6 +112,7 @@ export default function PlayersTable({
             <ThSortable state={tableState} field="name">
               {t('title')}
             </ThSortable>
+            <ThNotSortable>{t('player_profile_column')}</ThNotSortable>
             <ThSortable state={tableState} field="created">
               {t('created')}
             </ThSortable>

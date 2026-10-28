@@ -240,9 +240,10 @@ docker compose -f docker-compose.prod.yml restart bracket
 pg_restore --clean --if-exists --no-owner -d "postgresql://USUARIO:CLAVE@ep-xxxx.REGION.aws.neon.tech/neondb?sslmode=require" local.dump
 ```
 
-Al reiniciar, Bracket aplica las migraciones pendientes (incluida la que agrega `match_player_stats.team_id` y
-los goles en contra), así que no hay que hacer nada más. Los usuarios y contraseñas de tu base local se
-copian también: iniciás sesión con los de tu base, no con `ADMIN_EMAIL`.
+Al reiniciar, Bracket aplica las migraciones pendientes (incluidas las que agregan `match_player_stats.team_id`,
+los roles de usuario y los perfiles de jugador; **los goles en contra de los jugadores se eliminan**), así que no
+hay que hacer nada más. Los usuarios y contraseñas de tu base local se copian también: iniciás sesión con los de
+tu base, no con `ADMIN_EMAIL`. Todos los usuarios que ya existían quedan con rol `ADMIN`.
 
 ## 7. Problemas comunes
 
@@ -270,6 +271,32 @@ backend real.
 Oracle, Render y Neon, la conexión SSL a Neon, ni una sala de Haxball real (requiere el captcha del token).
 Los pasos de las opciones A y B están armados con la documentación oficial vigente, pero es esperable que
 algún detalle de las consolas web (nombres de menús) haya cambiado.
+
+## 8 bis. Cuentas de jugadores, roles y estadísticas acumuladas
+
+* **Roles**: `ADMIN` crea y edita clubes, torneos y todo lo que cuelga de ellos (y es el rol que necesita la
+  cuenta del bot). `USER` es un jugador: solo ve la página pública y su propia página **Mi jugador**.
+  Quien se registra en la web es siempre `USER`; los usuarios que ya existían, y el de `ADMIN_EMAIL`, son `ADMIN`.
+  Para promover o degradar una cuenta: `python cli.py set-user-role --email alguien@correo.com --role ADMIN`
+  (en Docker: `docker compose exec backend python cli.py set-user-role ...`).
+* **Registro abierto**: para que los jugadores puedan crear su cuenta, `ALLOW_USER_REGISTRATION` tiene que estar
+  en `true` (en `render.yaml` ya viene así). Como las cuentas nuevas no tienen ningún permiso de edición, abrirlo
+  es seguro; si te llegan registros basura, configurá un captcha (`CAPTCHA_SECRET`).
+* **Jugador con cuenta**: cada usuario crea su jugador (un nombre único, que queda reservado) y vincula su
+  navegador de Haxball con `!vincular CODIGO` (ver `bot/README.md`). Sus estadísticas de todos los torneos se
+  suman en su perfil. Quien no tiene cuenta sigue jugando igual, con estadísticas solo del torneo.
+* **¿Cómo se conecta un jugador con su fila del torneo?** Dos caminos, los dos disponibles:
+  * *Automático* (por defecto): si hay una fila **sin cuenta** de un torneo **abierto** con el mismo nombre que
+    el jugador (normalizado: sin tildes ni mayúsculas), se vincula sola, al crear el perfil o al crear la fila.
+    Los torneos archivados no se tocan.
+  * *Manual*: en **Jugadores** del torneo, cada fila tiene un botón para vincularla (o desvincularla) de un
+    jugador con cuenta. Es el camino para torneos viejos o nombres que no coinciden.
+  * Si preferís que **solo** vincule el organizador, poné `AUTO_LINK_PLAYERS_BY_NAME=false`. Es más seguro: con el
+    automático, alguien podría registrarse con el nombre de un inscripto antes que su dueño y quedarse con su
+    fila (los nombres de los jugadores son públicos). El bot ya tenía ese mismo punto débil con los nombres
+    sin cuenta; por eso el organizador siempre puede corregirlo a mano.
+* **Seguridad del vínculo**: el código es de un solo uso, vence a los 10 minutos, se guarda solo su hash y el
+  bot lo oculta del chat. Un `auth` no puede pertenecer a dos jugadores. Un jugador puede tener hasta 5 navegadores.
 
 ## 9. Página pública para tus seguidores
 

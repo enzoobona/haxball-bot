@@ -1,14 +1,15 @@
 import { AppShell, Burger, Center, Container, Group, Menu } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Icon } from '@tabler/icons-react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { Brand } from '@components/navbar/_brand';
 import { getBaseLinks, getBaseLinksDict } from '@components/navbar/_main_links';
 import { ColorSchemeToggle } from '@components/utils/color_scheme_toggle';
 import PreloadLink from '@components/utils/link';
+import { isPlayerSession } from '@services/local_storage';
 import classes from './_layout.module.css';
 
 interface HeaderActionLink {
@@ -115,6 +116,19 @@ function NavBar({ links }: any) {
 export default function Layout({ children, additionalNavbarLinks, breadcrumbs }: any) {
   const navbarState = useDisclosure();
   const [opened] = navbarState;
+  const navigate = useNavigate();
+
+  // Los jugadores con cuenta (rol USER) no tienen panel de organizador: van a su página.
+  const isPlayer = isPlayerSession();
+  useEffect(() => {
+    if (isPlayer) {
+      navigate('/jugador', { replace: true });
+    }
+  }, [isPlayer]);
+
+  if (isPlayer) {
+    return null;
+  }
 
   const linksComponent = (
     <AppShell.Section grow>

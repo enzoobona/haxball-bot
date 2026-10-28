@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from heliclockter import datetime_utc
 
-from bracket.models.db.account import UserAccountType
+from bracket.models.db.account import UserAccountType, UserRole
 from bracket.models.db.club import ClubInsertable
 from bracket.models.db.court import CourtInsertable
 from bracket.models.db.match import MatchInsertable
@@ -142,6 +142,7 @@ DUMMY_USER = UserInsertable(
     password_hash=hash_password("adminadmin"),
     created=DUMMY_MOCK_TIME,
     account_type=UserAccountType.REGULAR,
+    role=UserRole.ADMIN,
 )
 
 DUMMY_TEAM1 = TeamInsertable(

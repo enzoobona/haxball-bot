@@ -188,16 +188,14 @@ async def sql_finish_match(
                     player_id,
                     team_id,
                     goals,
-                    assists,
-                    own_goals
+                    assists
                 )
                 VALUES (
                     :match_id,
                     :player_id,
                     :team_id,
                     :goals,
-                    :assists,
-                    :own_goals
+                    :assists
                 )
             """,
             values={
@@ -206,7 +204,6 @@ async def sql_finish_match(
                 "team_id": stat.team_id,
                 "goals": stat.goals,
                 "assists": stat.assists,
-                "own_goals": stat.own_goals,
             },
         )
 
@@ -216,7 +213,6 @@ async def sql_finish_match(
                 SET
                     goals = goals + :goals,
                     assists = assists + :assists,
-                    own_goals = own_goals + :own_goals,
                     {result_column} = {result_column} + 1
                 WHERE id = :player_id
             """,
@@ -224,7 +220,6 @@ async def sql_finish_match(
                 "player_id": stat.player_id,
                 "goals": stat.goals,
                 "assists": stat.assists,
-                "own_goals": stat.own_goals,
             },
         )
 
@@ -275,8 +270,7 @@ async def sql_reset_match(
                 player_id,
                 team_id,
                 goals,
-                assists,
-                own_goals
+                assists
             FROM match_player_stats
             WHERE match_id = :match_id
         """,
@@ -296,7 +290,6 @@ async def sql_reset_match(
                 SET
                     goals = GREATEST(goals - :goals, 0),
                     assists = GREATEST(assists - :assists, 0),
-                    own_goals = GREATEST(own_goals - :own_goals, 0),
                     {result_column} = GREATEST({result_column} - 1, 0)
                 WHERE id = :player_id
             """,
@@ -304,7 +297,6 @@ async def sql_reset_match(
                 "player_id": stat["player_id"],
                 "goals": stat["goals"],
                 "assists": stat["assists"],
-                "own_goals": stat["own_goals"],
             },
         )
 
@@ -547,8 +539,7 @@ async def sql_get_match_player_stats_detail(
             mps.team_id,
             t.name AS team_name,
             mps.goals,
-            mps.assists,
-            mps.own_goals
+            mps.assists
         FROM match_player_stats AS mps
         JOIN players AS p
             ON p.id = mps.player_id

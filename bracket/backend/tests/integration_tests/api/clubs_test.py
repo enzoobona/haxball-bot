@@ -13,15 +13,14 @@ from tests.integration_tests.sql import inserted_club, inserted_user_x_club
 async def test_clubs_endpoint(
     startup_and_shutdown_uvicorn_server: None, auth_context: AuthContext
 ) -> None:
-    assert await send_auth_request(HTTPMethod.GET, "clubs", auth_context, {}) == {
-        "data": [
-            {
-                "created": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
-                "id": auth_context.club.id,
-                "name": "Some Cool Club",
-            }
-        ],
-    }
+    response = await send_auth_request(HTTPMethod.GET, "clubs", auth_context, {})
+
+    # El administrador de la instalacion ve todos los clubes (puede haber otros en la base).
+    assert {
+        "created": DUMMY_MOCK_TIME.isoformat().replace("+00:00", "Z"),
+        "id": auth_context.club.id,
+        "name": "Some Cool Club",
+    } in response["data"]
 
 
 @pytest.mark.asyncio(loop_scope="session")
