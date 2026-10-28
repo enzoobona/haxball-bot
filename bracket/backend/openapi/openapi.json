@@ -434,6 +434,158 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "HaxballIdentitiesResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/HaxballIdentityForBot"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "HaxballIdentitiesResponse",
+        "type": "object"
+      },
+      "HaxballIdentityForBot": {
+        "properties": {
+          "auth": {
+            "title": "Auth",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "profile_id": {
+            "title": "Profile Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "auth",
+          "profile_id",
+          "name"
+        ],
+        "title": "HaxballIdentityForBot",
+        "type": "object"
+      },
+      "HaxballIdentityMasked": {
+        "properties": {
+          "auth_hint": {
+            "title": "Auth Hint",
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "auth_hint",
+          "created"
+        ],
+        "title": "HaxballIdentityMasked",
+        "type": "object"
+      },
+      "HaxballLinkBody": {
+        "properties": {
+          "auth": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Auth",
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 32,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "auth"
+        ],
+        "title": "HaxballLinkBody",
+        "type": "object"
+      },
+      "HaxballLinkResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/HaxballLinkResult"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "HaxballLinkResponse",
+        "type": "object"
+      },
+      "HaxballLinkResult": {
+        "properties": {
+          "already_linked": {
+            "default": false,
+            "title": "Already Linked",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "profile_id": {
+            "title": "Profile Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "profile_id",
+          "name",
+          "already_linked"
+        ],
+        "title": "HaxballLinkResult",
+        "type": "object"
+      },
+      "LinkCode": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "expires_at"
+        ],
+        "title": "LinkCode",
+        "type": "object"
+      },
+      "LinkCodeResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/LinkCode"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "LinkCodeResponse",
+        "type": "object"
+      },
       "Match": {
         "properties": {
           "court_id": {
@@ -1426,6 +1578,74 @@
         "title": "MatchWithDetailsDefinitive",
         "type": "object"
       },
+      "MyHaxball": {
+        "description": "Todo lo que la pagina \"Mi jugador\" necesita en una sola respuesta.",
+        "properties": {
+          "identities": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/HaxballIdentityMasked"
+            },
+            "title": "Identities",
+            "type": "array"
+          },
+          "max_identities": {
+            "title": "Max Identities",
+            "type": "integer"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlayerProfilePublic"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stats": {
+            "$ref": "#/components/schemas/ProfileStats",
+            "default": {
+              "assists": 0,
+              "draws": 0,
+              "goals": 0,
+              "losses": 0,
+              "matches_played": 0,
+              "tournaments": 0,
+              "wins": 0
+            }
+          },
+          "tournaments": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProfileTournamentStats"
+            },
+            "title": "Tournaments",
+            "type": "array"
+          }
+        },
+        "required": [
+          "profile",
+          "identities",
+          "max_identities",
+          "stats",
+          "tournaments"
+        ],
+        "title": "MyHaxball",
+        "type": "object"
+      },
+      "MyHaxballResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MyHaxball"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "MyHaxballResponse",
+        "type": "object"
+      },
       "PaginatedPlayers": {
         "properties": {
           "count": {
@@ -1434,7 +1654,7 @@
           },
           "players": {
             "items": {
-              "$ref": "#/components/schemas/Player"
+              "$ref": "#/components/schemas/PlayerWithProfile"
             },
             "title": "Players",
             "type": "array"
@@ -1513,6 +1733,17 @@
             "title": "Name",
             "type": "string"
           },
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Id"
+          },
           "swiss_score": {
             "default": "0.0",
             "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
@@ -1541,6 +1772,7 @@
           "wins",
           "draws",
           "losses",
+          "profile_id",
           "id"
         ],
         "title": "Player",
@@ -1691,6 +1923,59 @@
         "title": "PlayerProfile",
         "type": "object"
       },
+      "PlayerProfileBody": {
+        "properties": {
+          "name": {
+            "maxLength": 30,
+            "minLength": 2,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PlayerProfileBody",
+        "type": "object"
+      },
+      "PlayerProfileLinkBody": {
+        "properties": {
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Id"
+          }
+        },
+        "required": [
+          "profile_id"
+        ],
+        "title": "PlayerProfileLinkBody",
+        "type": "object"
+      },
+      "PlayerProfilePublic": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PlayerProfilePublic",
+        "type": "object"
+      },
       "PlayerProfileResponse": {
         "properties": {
           "data": {
@@ -1701,6 +1986,22 @@
           "data"
         ],
         "title": "PlayerProfileResponse",
+        "type": "object"
+      },
+      "PlayerProfilesResponse": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/PlayerProfilePublic"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "PlayerProfilesResponse",
         "type": "object"
       },
       "PlayerStatsBody": {
@@ -1804,6 +2105,109 @@
         "title": "PlayerStatsRow",
         "type": "object"
       },
+      "PlayerWithProfile": {
+        "description": "Fila de jugador de un torneo, con el nombre de la cuenta a la que esta vinculada (si hay).",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "assists": {
+            "default": 0,
+            "title": "Assists",
+            "type": "integer"
+          },
+          "created": {
+            "format": "date-time",
+            "title": "Created",
+            "type": "string"
+          },
+          "draws": {
+            "default": 0,
+            "title": "Draws",
+            "type": "integer"
+          },
+          "elo_score": {
+            "default": "0.0",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Elo Score",
+            "type": "string"
+          },
+          "goals": {
+            "default": 0,
+            "title": "Goals",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "losses": {
+            "default": 0,
+            "title": "Losses",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Id"
+          },
+          "profile_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Name"
+          },
+          "swiss_score": {
+            "default": "0.0",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Swiss Score",
+            "type": "string"
+          },
+          "tournament_id": {
+            "title": "Tournament Id",
+            "type": "integer"
+          },
+          "wins": {
+            "default": 0,
+            "title": "Wins",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "active",
+          "name",
+          "created",
+          "tournament_id",
+          "goals",
+          "assists",
+          "elo_score",
+          "swiss_score",
+          "wins",
+          "draws",
+          "losses",
+          "profile_id",
+          "id",
+          "profile_name"
+        ],
+        "title": "PlayerWithProfile",
+        "type": "object"
+      },
       "PlayersResponse": {
         "properties": {
           "data": {
@@ -1830,6 +2234,104 @@
           "data"
         ],
         "title": "PlayersStatsResponse",
+        "type": "object"
+      },
+      "ProfileStats": {
+        "properties": {
+          "assists": {
+            "default": 0,
+            "title": "Assists",
+            "type": "integer"
+          },
+          "draws": {
+            "default": 0,
+            "title": "Draws",
+            "type": "integer"
+          },
+          "goals": {
+            "default": 0,
+            "title": "Goals",
+            "type": "integer"
+          },
+          "losses": {
+            "default": 0,
+            "title": "Losses",
+            "type": "integer"
+          },
+          "matches_played": {
+            "default": 0,
+            "title": "Matches Played",
+            "type": "integer"
+          },
+          "tournaments": {
+            "default": 0,
+            "title": "Tournaments",
+            "type": "integer"
+          },
+          "wins": {
+            "default": 0,
+            "title": "Wins",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tournaments",
+          "matches_played",
+          "goals",
+          "assists",
+          "wins",
+          "draws",
+          "losses"
+        ],
+        "title": "ProfileStats",
+        "type": "object"
+      },
+      "ProfileTournamentStats": {
+        "properties": {
+          "assists": {
+            "default": 0,
+            "title": "Assists",
+            "type": "integer"
+          },
+          "draws": {
+            "default": 0,
+            "title": "Draws",
+            "type": "integer"
+          },
+          "goals": {
+            "default": 0,
+            "title": "Goals",
+            "type": "integer"
+          },
+          "losses": {
+            "default": 0,
+            "title": "Losses",
+            "type": "integer"
+          },
+          "tournament_id": {
+            "title": "Tournament Id",
+            "type": "integer"
+          },
+          "tournament_name": {
+            "title": "Tournament Name",
+            "type": "string"
+          },
+          "wins": {
+            "default": 0,
+            "title": "Wins",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tournament_id",
+          "tournament_name",
+          "goals",
+          "assists",
+          "wins",
+          "draws",
+          "losses"
+        ],
+        "title": "ProfileTournamentStats",
         "type": "object"
       },
       "Ranking": {
@@ -3323,6 +3825,10 @@
             "title": "Access Token",
             "type": "string"
           },
+          "role": {
+            "$ref": "#/components/schemas/UserRole",
+            "default": "USER"
+          },
           "token_type": {
             "title": "Token Type",
             "type": "string"
@@ -3335,7 +3841,8 @@
         "required": [
           "access_token",
           "token_type",
-          "user_id"
+          "user_id",
+          "role"
         ],
         "title": "Token",
         "type": "object"
@@ -3668,6 +4175,10 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole",
+            "default": "USER"
           }
         },
         "required": [
@@ -3675,6 +4186,7 @@
           "name",
           "created",
           "account_type",
+          "role",
           "id"
         ],
         "title": "UserPublic",
@@ -3691,6 +4203,15 @@
         ],
         "title": "UserPublicResponse",
         "type": "object"
+      },
+      "UserRole": {
+        "description": "ADMIN: crea y edita clubes, torneos y todo lo que cuelga de ellos (tambien el bot).\nUSER: jugador con cuenta. Solo ve la parte publica y sus propias estadisticas.",
+        "enum": [
+          "ADMIN",
+          "USER"
+        ],
+        "title": "UserRole",
+        "type": "string"
       },
       "UserToRegister": {
         "properties": {
@@ -3792,7 +4313,7 @@
     }
   },
   "info": {
-    "description": "\n### Description\nThis API allows you to do everything the frontend of [Bracket](https://github.com/evroon/bracket)\nallows you to do (the frontend uses this API as well).\n\nFore more information, see the [documentation](https://docs.bracketapp.nl).\n\n### Table of Contents\n*(links only work for [ReDoc](https://api.bracketapp.nl/redoc), not for Swagger UI)*\n\n- [Auth](#tag/Auth)\n\n- [Clubs](#tag/Clubs)\n\n- [Courts](#tag/Courts)\n\n- [Internals](#tag/Internals)\n\n- [Matches](#tag/Matches)\n\n- [Players](#tag/Players)\n\n- [Rankings](#tag/Rankings)\n\n- [Rounds](#tag/Rounds)\n\n- [Stage Items](#tag/Stage-Items)\n\n- [Stage Item Inputs](#tag/Stage-Item-Inputs)\n\n- [Stages](#tag/Stages)\n\n- [Stats](#tag/Stats)\n\n- [Teams](#tag/Teams)\n\n- [Tournaments](#tag/Tournaments)\n\n- [Users](#tag/Users)\n\n### Links\nGitHub: <https://github.com/evroon/bracket>\n\nDocs: <https://docs.bracketapp.nl>\n\nDemo: <https://www.bracketapp.nl/demo>\n\nAPI docs (Redoc): <https://api.bracketapp.nl/redoc>\n\nAPI docs (Swagger UI): <https://api.bracketapp.nl/docs>\n",
+    "description": "\n### Description\nThis API allows you to do everything the frontend of [Bracket](https://github.com/evroon/bracket)\nallows you to do (the frontend uses this API as well).\n\nFore more information, see the [documentation](https://docs.bracketapp.nl).\n\n### Table of Contents\n*(links only work for [ReDoc](https://api.bracketapp.nl/redoc), not for Swagger UI)*\n\n- [Auth](#tag/Auth)\n\n- [Clubs](#tag/Clubs)\n\n- [Courts](#tag/Courts)\n\n- [Haxball](#tag/Haxball)\n\n- [Internals](#tag/Internals)\n\n- [Matches](#tag/Matches)\n\n- [Players](#tag/Players)\n\n- [Rankings](#tag/Rankings)\n\n- [Rounds](#tag/Rounds)\n\n- [Stage Items](#tag/Stage-Items)\n\n- [Stage Item Inputs](#tag/Stage-Item-Inputs)\n\n- [Stages](#tag/Stages)\n\n- [Stats](#tag/Stats)\n\n- [Teams](#tag/Teams)\n\n- [Tournaments](#tag/Tournaments)\n\n- [Users](#tag/Users)\n\n### Links\nGitHub: <https://github.com/evroon/bracket>\n\nDocs: <https://docs.bracketapp.nl>\n\nDemo: <https://www.bracketapp.nl/demo>\n\nAPI docs (Redoc): <https://api.bracketapp.nl/redoc>\n\nAPI docs (Swagger UI): <https://api.bracketapp.nl/docs>\n",
     "license": {
       "name": "AGPL-3.0",
       "url": "https://www.gnu.org/licenses/agpl-3.0.en.html"
@@ -3972,6 +4493,337 @@
         "summary": "Update Club",
         "tags": [
           "Clubs"
+        ]
+      }
+    },
+    "/haxball/identities": {
+      "get": {
+        "description": "Lista `auth -> perfil` para que el bot reconozca a los jugadores que entran a la sala.",
+        "operationId": "get_identities_haxball_identities_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HaxballIdentitiesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get Identities",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/link": {
+      "post": {
+        "description": "El bot confirma un `!vincular CODIGO`: guarda auth <-> perfil y gasta el codigo.",
+        "operationId": "link_haxball_identity_haxball_link_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HaxballLinkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HaxballLinkResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Link Haxball Identity",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/me": {
+      "get": {
+        "description": "Mi jugador: perfil, navegadores vinculados y estadisticas acumuladas.",
+        "operationId": "get_my_haxball_haxball_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyHaxballResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Get My Haxball",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/me/identities/{identity_id}": {
+      "delete": {
+        "operationId": "delete_my_identity_haxball_me_identities__identity_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "identity_id",
+            "required": true,
+            "schema": {
+              "title": "Identity Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Delete My Identity",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/me/link-code": {
+      "post": {
+        "description": "Codigo de un solo uso para vincular un navegador. Reemplaza al anterior, si lo habia.",
+        "operationId": "create_link_code_haxball_me_link_code_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkCodeResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create Link Code",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/me/profile": {
+      "post": {
+        "description": "Crea mi jugador. El nombre queda reservado: nadie mas puede usarlo en las salas.",
+        "operationId": "create_my_profile_haxball_me_profile_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerProfileBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyHaxballResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Create My Profile",
+        "tags": [
+          "Haxball"
+        ]
+      },
+      "put": {
+        "operationId": "rename_my_profile_haxball_me_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerProfileBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyHaxballResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Rename My Profile",
+        "tags": [
+          "Haxball"
+        ]
+      }
+    },
+    "/haxball/profiles": {
+      "get": {
+        "description": "Para vincular a mano una fila de jugador de un torneo con un perfil.",
+        "operationId": "search_profiles_haxball_profiles_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlayerProfilesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Search Profiles",
+        "tags": [
+          "Haxball"
         ]
       }
     },
@@ -5634,6 +6486,71 @@
         "summary": "Get Player Profile",
         "tags": [
           "Stats"
+        ]
+      },
+      "put": {
+        "description": "Vincula (o desvincula, con `profile_id: null`) una fila del torneo con un jugador con cuenta.\n\nFunciona tambien en torneos archivados: es la forma de reclamar estadisticas viejas.",
+        "operationId": "link_player_to_profile_tournaments__tournament_id__players__player_id__profile_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tournament_id",
+            "required": true,
+            "schema": {
+              "title": "Tournament Id",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "path",
+            "name": "player_id",
+            "required": true,
+            "schema": {
+              "title": "Player Id",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlayerProfileLinkBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SinglePlayerResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "summary": "Link Player To Profile",
+        "tags": [
+          "Players"
         ]
       }
     },

@@ -12,9 +12,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
-async def verify_captcha_token(captcha_token: str) -> bool:
+async def verify_captcha_token(captcha_token: str | None) -> bool:
     if config.captcha_secret is None:
         return True
+
+    if not captcha_token:
+        return False
 
     payload = {"response": captcha_token, "secret": config.captcha_secret}
 

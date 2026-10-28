@@ -62,14 +62,14 @@ class UserPasswordToUpdate(BaseModel):
 
 
 class DemoUserToRegister(BaseModelORM):
-    captcha_token: str
+    captcha_token: str | None = None
 
 
 class UserToRegister(BaseModelORM):
     email: str
     name: str
     password: str
-    captcha_token: str
+    captcha_token: str | None = None
 
 
 class UserInDB(UserBase):
