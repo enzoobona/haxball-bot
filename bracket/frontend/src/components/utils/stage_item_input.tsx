@@ -35,7 +35,7 @@ export function formatStageItemInputTentative(
 }
 
 export function formatStageItemInput(
-  stage_item_input: StageItemInput | null,
+  stage_item_input: StageItemInput | null | undefined,
   stageItemsLookup: any,
 ) {
   if (stage_item_input == null) return null;

@@ -2,7 +2,6 @@ import { MatchWithDetails } from '@openapi';
 import dayjs from 'dayjs';
 import { formatStageItemInput } from './stage_item_input';
 import { Translator } from './types';
-import { assert_not_none } from './assert';
 
 export interface SchedulerSettings {
   eloThreshold: number;
@@ -41,10 +40,7 @@ export function formatMatchInput1(
   matchesLookup: any,
   match: MatchWithDetails,
 ): string {
-  const formatted = formatStageItemInput(
-    assert_not_none(match.stage_item_input1),
-    stageItemsLookup,
-  );
+  const formatted = formatStageItemInput(match.stage_item_input1, stageItemsLookup);
   if (formatted != null) return formatted;
 
   if (match.stage_item_input1_winner_from_match_id == null) {
@@ -62,10 +58,7 @@ export function formatMatchInput2(
   matchesLookup: any,
   match: MatchWithDetails,
 ): string {
-  const formatted = formatStageItemInput(
-    assert_not_none(match.stage_item_input2),
-    stageItemsLookup,
-  );
+  const formatted = formatStageItemInput(match.stage_item_input2, stageItemsLookup);
   if (formatted != null) return formatted;
 
   if (match.stage_item_input2_winner_from_match_id == null) {

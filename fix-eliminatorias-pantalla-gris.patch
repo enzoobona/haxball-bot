@@ -1,0 +1,74 @@
+diff --git a/bracket/frontend/src/components/brackets/match_large.tsx b/bracket/frontend/src/components/brackets/match_large.tsx
+index 4b15103..e08ecd0 100644
+--- a/bracket/frontend/src/components/brackets/match_large.tsx
++++ b/bracket/frontend/src/components/brackets/match_large.tsx
+@@ -1,5 +1,4 @@
+ import { Card, Center, Grid, Text } from '@mantine/core';
+-import { assert_not_none } from '@components/utils/assert';
+ import { Time } from '@components/utils/datetime';
+ import { formatStageItemInput } from '@components/utils/stage_item_input';
+ import { MatchWithDetails } from '@openapi';
+@@ -17,12 +16,12 @@ export default function MatchLarge({
+         <Grid align="center">
+           <Grid.Col span={{ sm: 9 }}>
+             <Text lineClamp={1} inherit>
+-              {formatStageItemInput(assert_not_none(match.stage_item_input1), stageItemsLookup) || (
++              {formatStageItemInput(match.stage_item_input1, stageItemsLookup) || (
+                 <i>N/A</i>
+               )}
+             </Text>
+             <Text lineClamp={1} inherit>
+-              {formatStageItemInput(assert_not_none(match.stage_item_input2), stageItemsLookup) || (
++              {formatStageItemInput(match.stage_item_input2, stageItemsLookup) || (
+                 <i>N/A</i>
+               )}
+             </Text>
+diff --git a/bracket/frontend/src/components/utils/match.tsx b/bracket/frontend/src/components/utils/match.tsx
+index 1207c18..b7c21b1 100644
+--- a/bracket/frontend/src/components/utils/match.tsx
++++ b/bracket/frontend/src/components/utils/match.tsx
+@@ -2,7 +2,6 @@ import { MatchWithDetails } from '@openapi';
+ import dayjs from 'dayjs';
+ import { formatStageItemInput } from './stage_item_input';
+ import { Translator } from './types';
+-import { assert_not_none } from './assert';
+ 
+ export interface SchedulerSettings {
+   eloThreshold: number;
+@@ -41,10 +40,7 @@ export function formatMatchInput1(
+   matchesLookup: any,
+   match: MatchWithDetails,
+ ): string {
+-  const formatted = formatStageItemInput(
+-    assert_not_none(match.stage_item_input1),
+-    stageItemsLookup,
+-  );
++  const formatted = formatStageItemInput(match.stage_item_input1, stageItemsLookup);
+   if (formatted != null) return formatted;
+ 
+   if (match.stage_item_input1_winner_from_match_id == null) {
+@@ -62,10 +58,7 @@ export function formatMatchInput2(
+   matchesLookup: any,
+   match: MatchWithDetails,
+ ): string {
+-  const formatted = formatStageItemInput(
+-    assert_not_none(match.stage_item_input2),
+-    stageItemsLookup,
+-  );
++  const formatted = formatStageItemInput(match.stage_item_input2, stageItemsLookup);
+   if (formatted != null) return formatted;
+ 
+   if (match.stage_item_input2_winner_from_match_id == null) {
+diff --git a/bracket/frontend/src/components/utils/stage_item_input.tsx b/bracket/frontend/src/components/utils/stage_item_input.tsx
+index 9aec01e..8d4cc28 100644
+--- a/bracket/frontend/src/components/utils/stage_item_input.tsx
++++ b/bracket/frontend/src/components/utils/stage_item_input.tsx
+@@ -35,7 +35,7 @@ export function formatStageItemInputTentative(
+ }
+ 
+ export function formatStageItemInput(
+-  stage_item_input: StageItemInput | null,
++  stage_item_input: StageItemInput | null | undefined,
+   stageItemsLookup: any,
+ ) {
+   if (stage_item_input == null) return null;

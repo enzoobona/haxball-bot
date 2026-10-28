@@ -1,0 +1,61 @@
+diff --git a/bot/script.js b/bot/script.js
+index 70b7103..0761452 100644
+--- a/bot/script.js
++++ b/bot/script.js
+@@ -53,6 +53,8 @@ HaxballJS().then(async (HBInit) => {
+ 
+     // Intentos fallidos de !vincular por jugador (se expulsa al llegar a 5).
+     const linkFailures = new Map();
++    // Haxball solo entrega player.auth en onPlayerJoin (no en onPlayerChat), así que se guarda acá.
++    const authByPlayerId = new Map();
+ 
+     // La sala se crea más abajo, pero Bracket se carga antes: se guarda acá para poder consultarla.
+     let roomInstance = null;
+@@ -115,7 +117,7 @@ HaxballJS().then(async (HBInit) => {
+     }
+ 
+     function attachProfile(player) {
+-        const profile = identityDirectory.getByAuth(player.auth);
++        const profile = identityDirectory.getByAuth(authByPlayerId.get(player.id) ?? player.auth);
+ 
+         if (profile) {
+             roomProfiles.set(player.id, profile);
+@@ -1666,6 +1668,10 @@ HaxballJS().then(async (HBInit) => {
+     }
+ 
+     room.onPlayerJoin = function(player) {
++        if (player.auth) {
++            authByPlayerId.set(player.id, player.auth);
++        }
++
+         // Nombres duplicados: !sub / !captain no podrían distinguirlos y se mezclarían las stats.
+         const duplicated = room
+             .getPlayerList()
+@@ -1737,6 +1743,7 @@ HaxballJS().then(async (HBInit) => {
+     room.onPlayerLeave = function(player) {
+         adminFailures.delete(player.id);
+         linkFailures.delete(player.id);
++        authByPlayerId.delete(player.id);
+         roomProfiles.delete(player.id);
+ 
+         updateAdmins();
+@@ -1997,7 +2004,9 @@ HaxballJS().then(async (HBInit) => {
+             // Se vincula el navegador a la cuenta de la web. Devuelve false SIEMPRE: así el código
+             // no se ve en el chat (y además vence rápido y se gasta al usarse).
+             case "vincular": {
+-                if (!player.auth) {
++                const linkAuth = authByPlayerId.get(player.id) ?? player.auth;
++
++                if (!linkAuth) {
+                     sendError(
+                         player,
+                         "Haxball no te entregó una identidad (auth), así que no se puede vincular este navegador."
+@@ -2022,7 +2031,7 @@ HaxballJS().then(async (HBInit) => {
+                 }
+ 
+                 try {
+-                    const result = await vincularHaxball(args.join(""), player.auth);
++                    const result = await vincularHaxball(args.join(""), linkAuth);
+ 
+                     linkFailures.delete(player.id);
+ 

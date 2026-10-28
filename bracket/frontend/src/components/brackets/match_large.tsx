@@ -1,5 +1,4 @@
 import { Card, Center, Grid, Text } from '@mantine/core';
-import { assert_not_none } from '@components/utils/assert';
 import { Time } from '@components/utils/datetime';
 import { formatStageItemInput } from '@components/utils/stage_item_input';
 import { MatchWithDetails } from '@openapi';
@@ -17,12 +16,12 @@ export default function MatchLarge({
         <Grid align="center">
           <Grid.Col span={{ sm: 9 }}>
             <Text lineClamp={1} inherit>
-              {formatStageItemInput(assert_not_none(match.stage_item_input1), stageItemsLookup) || (
+              {formatStageItemInput(match.stage_item_input1, stageItemsLookup) || (
                 <i>N/A</i>
               )}
             </Text>
             <Text lineClamp={1} inherit>
-              {formatStageItemInput(assert_not_none(match.stage_item_input2), stageItemsLookup) || (
+              {formatStageItemInput(match.stage_item_input2, stageItemsLookup) || (
                 <i>N/A</i>
               )}
             </Text>
