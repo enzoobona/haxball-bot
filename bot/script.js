@@ -8,7 +8,7 @@ import { login } from "./bracket-api/auth.js";
 import { obtenerTorneo } from "./bracket-api/tournaments.js";
 import { obtenerJugadores } from "./bracket-api/players.js";
 import { obtenerEquipos } from "./bracket-api/teams.js";
-import { obtenerPartido, finalizarPartido, resetearPartido } from "./bracket-api/matches.js";
+import { obtenerPartidoPorNumero, finalizarPartido, resetearPartido } from "./bracket-api/matches.js";
 import { obtenerIdentidades, vincularHaxball } from "./bracket-api/identities.js";
 import { getApiErrorMessage } from "./bracket-api/api.js";
 
@@ -208,21 +208,29 @@ HaxballJS().then(async (HBInit) => {
         return { playerStats, skipped };
     }
 
-    async function getMatch(matchId) {
+    // Recibe el NÚMERO del partido dentro del torneo (no el id global de la tabla matches).
+    async function getMatch(matchNumber) {
         try {
-            return await obtenerPartido(
+            return await obtenerPartidoPorNumero(
                 tournamentId,
-                matchId
+                matchNumber
             );
         } catch (error) {
+            if (error.response?.status === 404) {
+                return null;
+            }
+
             console.error(
-                `Error obteniendo partido número: ${matchId}`,
-                error
+                `Error obteniendo partido número: ${matchNumber}`,
+                error.message
             );
 
             return null;
         }
     }
+
+    // id global -> número del torneo, para mostrar el número en los avisos de la cola.
+    const matchNumbers = new Map();
 
     function sendResultToBracket(entry) {
         return finalizarPartido(
@@ -244,10 +252,10 @@ HaxballJS().then(async (HBInit) => {
             const result = await flushQueue(resultQueue, sendResultToBracket);
 
             for (const matchId of [...result.sent, ...result.alreadyRegistered]) {
-                console.log(`Resultado pendiente del partido #${matchId} registrado en Bracket.`);
+                console.log(`Resultado pendiente del partido #${matchNumbers.get(matchId) ?? matchId} registrado en Bracket.`);
 
                 room.sendAnnouncement(
-                    `✅ Partido #${matchId} registrado en Bracket (reintento automático).`,
+                    `✅ Partido #${matchNumbers.get(matchId) ?? matchId} registrado en Bracket (reintento automático).`,
                     null,
                     0xFFFFFF,
                     "bold"
@@ -1004,6 +1012,8 @@ HaxballJS().then(async (HBInit) => {
             }
 
             const { playerStats, skipped } = buildMatchPlayerStats(finalStats, match);
+
+            matchNumbers.set(match.id, match.number);
 
             const entry = {
                 matchId: match.id,
@@ -2233,7 +2243,7 @@ HaxballJS().then(async (HBInit) => {
 
                 if (!setTeams(match.team_1_name, match.team_2_name)) {
                     room.sendAnnouncement(
-                        `❌ No se pudieron configurar los equipos del partido #${match.id}.`,
+                        `❌ No se pudieron configurar los equipos del partido #${match.number ?? partidoId}.`,
                         player.id,
                         0xFF0000,
                         "bold"
@@ -2557,9 +2567,20 @@ HaxballJS().then(async (HBInit) => {
                 }
 
                 try {
+                    const matchToReset = await getMatch(partidoId);
+
+                    if (!matchToReset) {
+                        sendError(
+                            player,
+                            `No se encontró el partido #${partidoId}.`
+                        );
+
+                        return false;
+                    }
+
                     // Si el resultado nunca llegó a Bracket (quedó en la cola), alcanza con descartarlo.
-                    if (resultQueue.list().some(item => item.matchId === partidoId)) {
-                        resultQueue.remove(partidoId);
+                    if (resultQueue.list().some(item => item.matchId === matchToReset.id)) {
+                        resultQueue.remove(matchToReset.id);
 
                         room.sendAnnouncement(
                             `♻️ Se descartó el resultado pendiente del partido #${partidoId}.`,
@@ -2573,10 +2594,10 @@ HaxballJS().then(async (HBInit) => {
 
                     await resetearPartido(
                         tournamentId,
-                        partidoId
+                        matchToReset.id
                     );
 
-                    if (currentMatch?.id === partidoId) {
+                    if (currentMatch?.id === matchToReset.id) {
                         currentMatch = null;
                     }
 
@@ -2833,7 +2854,7 @@ HaxballJS().then(async (HBInit) => {
 
                 for (const item of pending) {
                     room.sendAnnouncement(
-                        `⏳ Partido #${item.matchId}: ${item.attempts} intento(s)` +
+                        `⏳ Partido #${matchNumbers.get(item.matchId) ?? item.matchId}: ${item.attempts} intento(s)` +
                         `${item.stuck ? " [TRABADO: usá !reintentar]" : ""}` +
                         `${item.lastError ? ` — ${item.lastError}` : ""}`,
                         player.id,

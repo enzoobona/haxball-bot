@@ -1,5 +1,14 @@
 import { api } from "./api.js";
 
+// Partido por su NÚMERO dentro del torneo (1, 2, 3...), que es lo que se escribe en el chat.
+export async function obtenerPartidoPorNumero(tournamentId, number) {
+    const { data } = await api.get(
+        `/tournaments/${tournamentId}/matches/number/${number}`
+    );
+
+    return data?.data ?? null;
+}
+
 export async function obtenerPartido(tournamentId, matchId) {
     const { data } = await api.get(
         `/tournaments/${tournamentId}/matches/${matchId}`
